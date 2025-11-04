@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="favicon.ico">
 
-    <title>TMP</title>
+    <title>ePiE</title>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> -->
 
@@ -31,6 +31,9 @@
       var lockedTabs = {Welcome_screen: false, File_browser: false, API_properties: false, Basin_select: false, Run_process: false, Map_results: false};
       lockedTabs['Welcome_screen'] = false;
 
+      // chem properties table data
+      var chem_data = [];
+
     </script>
 
     <!-- interface helper functions -->
@@ -41,7 +44,7 @@
 
     <!-- epie functions -->
     <script src="epie/_createBasinMap.js"></script>
-    <script src="epie/_CompleteChemProperties.js"></script> !!!???//// continue here!
+    <script src="epie/_CompleteChemProperties.js"></script> 
 
     <!-- local epie data -->
     <script src="data/basin_geo/Basin.js"></script>

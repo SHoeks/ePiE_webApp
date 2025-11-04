@@ -99,13 +99,17 @@ function runAPICompleteWrapper(){
   chem["k_bio_wwtp_n"] = chem["k_bio_wwtp"]
   chem["API"]
   let chemArray = [chem];
-  console.log(chemArray);
+  
+  // loop over all chem params (chemArray)
+  var f = chemArray[0];
+  Object.keys(f).forEach(function(key) {console.log(key,":",f[key]);});
 
   // complete chem properties
   let chem2 = completeChemProperties(chemArray); //!!
   console.log("chem2:",chem2);
   chem2[0]['metab'] = 0
   chem2[0]['API_metab'] = 0
+  chem_data = chem2; // update global variable
 
   // // write chem to to csv
   // var headers = Object.keys(chem2[0]).join(";");
@@ -141,6 +145,9 @@ function runAPICompleteWrapper(){
 
   //let colsToComplete = ["Kp_ps_n","Kp_as_n","Kp_sd_n","k_bio_wwtp_n","k_bio_sw1_n","T_bio_sw_n","k_hydro_sw_n","T_hydro_sw_n"];
 
+  // keys
+  var keys = Object.keys(f);
+
   // fill table 2 if possible
   var targetDiv = document.getElementsByClassName("tableField2");
   var targetDivIds = [];
@@ -151,9 +158,14 @@ function runAPICompleteWrapper(){
     if(targetDiv[i].value == ""){
       let colName = targetDiv[i].id.split("_row")[0];
       let rowIndex = targetDiv[i].id.split("_row")[1];
-      let colIndex = derivedDataHeader.findIndex(x=>x==colName);
-      let value = Math.round(derivedData[rowIndex-1][colIndex]*10000)/10000.00;
-      console.log(rowIndex + " - " + colName + " - " + colIndex + " - " + value);
+
+      // let colIndex = derivedDataHeader.findIndex(x=>x==colName);
+      // console.log(rowIndex + " - " + colName + " - " + colIndex + " - " + value);
+      // let value = Math.round(derivedData[rowIndex-1][colIndex]*10000)/10000.00;
+
+      chem_data[0][colName]
+      let value = Math.round(chem_data[0][colName]*10000)/10000.00;
+
       targetDiv[i].value = value;
       targetDiv[i].setAttribute('value',value);
       if(colName!="KOW_n") {
@@ -175,11 +187,16 @@ function runAPICompleteWrapper(){
   for(let i = 0; i < targetDiv_alt.length; i++) {
     if(targetDiv_alt[i].value == ""){
       let colName = targetDiv_alt[i].id.split("_row")[0];
-      console.log(colName);
       let rowIndex = targetDiv_alt[i].id.split("_row")[1];
-      let colIndex = derivedDataHeader.findIndex(x=>x==colName);
-      let value = Math.round(derivedData[rowIndex-1][colIndex]*10000)/10000.00;
-      console.log(rowIndex + " - " + colName + " - " + colIndex + " - " + value);
+      
+      // console.log(colName);
+      // let colIndex = derivedDataHeader.findIndex(x=>x==colName);
+      // console.log(rowIndex + " - " + colName + " - " + colIndex + " - " + value);
+      // let value = Math.round(derivedData[rowIndex-1][colIndex]*10000)/10000.00;
+
+      chem_data[0][colName]
+      let value = Math.round(chem_data[0][colName]*10000)/10000.00;
+      
       targetDiv_alt[i].value = value;
       targetDiv_alt[i].setAttribute('value',value); 
       targetDiv_alt[i].style.color = "#ff9000";
