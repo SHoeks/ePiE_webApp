@@ -1,0 +1,1 @@
+This application was developed by Selwyn Hoeks at Radboud University supported by the PREMIER project to facilitate the use of the ePiE model and falls under the GNU General Public License v3.0.

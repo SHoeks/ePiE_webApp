@@ -1,0 +1,642 @@
+<script>
+// /* eslint-disable */
+import fs from 'fs'
+import pathModule from 'path'
+import { app } from '@electron/remote'
+import { dialog } from '@electron/remote'
+import { computed, ref } from 'vue'
+// import {spawn} from 'child_process'
+import Gradient from "javascript-color-gradient";
+import FilesViewer from './components/FilesViewer'
+// import { execSync } from 'child_process'
+// var os = require('os');
+
+// import xlsx from 'node-xlsx';
+// import {fromEvent} from 'file-selector';
+
+// import js functions
+import openTab from './assets/openTab.js'
+import openWelcomeTab from './assets/openWelcomeTab.js'
+import checkTabLocks from './assets/checkTabLocks.js'
+import tableToCSV from './assets/tableToCSV.js'
+import tableConsToCSV from './assets/tableConsToCSV.js'
+import tableRmFracToCSV from './assets/tableRmFracToCSV.js'
+import editTabValues from './assets/editTabValues.js'
+import saveTabValues from './assets/saveTabValues.js'
+import createPNECOutputMap from './assets/createPNECOutputMap.js'
+import createOutputMap from './assets/createOutputMap.js'
+import createBasinMap from './assets/createBasinMap.js'
+import getExcelAPIDataTemplate from './assets/getExcelAPIDataTemplate.js'
+import loadCSVDataAPIDerived from './assets/loadCSVDataAPIDerived.js'
+import removeLastAPItableRow from './assets/removeLastAPItableRow.js'
+import addAPItableRow from './assets/addAPItableRow.js'
+import loadExcelData from './assets/loadExcelData.js'
+import copyOverAPI_ID from './assets/copyOverAPI_ID.js'
+import populationPerCapConversion from './assets/populationPerCapConversion.js'
+import getCountriesConsPop from './assets/getCountriesConsPop.js'
+import exportSpatialGEOJSON from './assets/exportSpatialGEOJSON.js'
+import exportFullOutputExcel from './assets/exportFullOutputExcel.js'
+import CalculateBasinStatistics from './assets/CalculateBasinStatistics.js'
+import formatSize from './assets/formatSize.js'
+
+// javascript translations
+import generateConsumptionTable from './assets/epie/generateConsumptionTable.js'
+import completeChemProperties from './assets/epie/CompleteChemProperties.js'
+import SimpleTreat4_0 from './assets/epie/SimpleTreat4_0.js'
+import AccessBasinDB from './assets/epie/AccessBasinDB.js'
+import RunModelePiE from './assets/epie/RunModelePiE.js'
+
+var appVersion = require('electron').remote.app.getVersion(); 
+
+import './assets/style.css'
+import './assets/leaflet.css'
+
+const varNcolors = 20;
+const gradientArray = new Gradient()
+.setColorGradient("#3F2CAF", "#edc988", "#e9446a")
+.setMidpoint(varNcolors)
+.getColors();
+const varNcolorsCheck = gradientArray.length;
+
+console.log(gradientArray);
+console.log(varNcolorsCheck);
+
+// check if in dev or prod mode
+const isDevelopment = process.env.NODE_ENV !== 'production'
+console.log('isDevelopment: ', isDevelopment);
+
+// get the app root directory
+var appRootDir = require('app-root-dir').get();
+console.log("appRootDir: ",appRootDir)
+
+// develop paths
+// tmp file directory path
+var fullTempPathDir = appRootDir+'/resources/tmp_data/';
+var fullBasinResourceDir = appRootDir+'/resources/basins/';
+var APIExcelTemplateFullPath = appRootDir+'/resources/model_inputs/chem_Oldenkamp2018_SI.xlsx';
+
+// production paths
+if(!isDevelopment) {
+  fullTempPathDir = app.getPath("temp");
+  APIExcelTemplateFullPath = appRootDir+'/model_inputs/chem_Oldenkamp2018_SI.xlsx';
+  fullBasinResourceDir = appRootDir+'/basins/';
+}
+console.log("fullTempPathDir: ",fullTempPathDir)
+
+// global setup var
+var selected_basins = [];
+var selected_basins_names = [];
+selected_basins.splice(0,selected_basins.length)
+selected_basins_names.splice(0,selected_basins_names.length)
+var basinMapCreated = false;
+//var lockedTabs = {Welcome_screen: true, File_browser: true, API_properties: true, Basin_select: true, Run_process: true, Map_results: true};
+var lockedTabs = {Welcome_screen: false, File_browser: false, API_properties: false, Basin_select: false, Run_process: false, Map_results: false};
+lockedTabs['Welcome_screen'] = false;
+
+function setAppVersion() {
+  let elem = document.querySelector("#appversionbox");
+  elem.innerText = appVersion;
+}
+
+export default {
+  name: 'App',
+  mounted() {
+    // on load function DOM access go here
+    openWelcomeTab("Welcome_screen", 0); // load the welcome tab
+    lockedTabs['Welcome_screen'] = false; // unlock the welcome tab
+    lockedTabs['File_browser'] = false; // unlock the file browser tab
+    lockedTabs['API_properties'] = false; // unlock the API properties tab
+    console.log(lockedTabs)
+    checkTabLocks(lockedTabs);
+    setAppVersion(); // set the app version
+  },
+  components: { FilesViewer },
+  setup() {
+    const path = ref(app.getAppPath())
+    const files = computed(() => {
+      const fileNames = fs.readdirSync(path.value)
+      return fileNames
+        .map(file => {
+          const stats = fs.statSync(pathModule.join(path.value, file))
+          return {
+            name: file,
+            size: stats.isFile() ? formatSize(stats.size ?? 0) : null,
+            directory: stats.isDirectory()
+          }
+        })
+        .sort((a, b) => {
+          if (a.directory === b.directory) {
+            return a.name.localeCompare(b.name)
+          }
+          return a.directory ? -1 : 1
+        })
+    })
+
+    const back = () => {
+      path.value = pathModule.dirname(path.value)
+    }
+    const open = folder => {
+      path.value = pathModule.join(path.value, folder)
+    }
+
+    const searchString = ref('')
+    const filteredFiles = computed(() => {
+      return searchString.value
+        ? files.value.filter(s => s.name.startsWith(searchString.value))
+        : files.value
+    })
+
+    function createBasinMapWrapper(){
+      createBasinMap(selected_basins,selected_basins_names);
+    }
+
+    function createOutputMapWrapper(){
+      createOutputMap(varNcolorsCheck, gradientArray, fullTempPathDir);
+    }
+    function createPNECOutputMapWrapper(){
+      createPNECOutputMap(varNcolorsCheck, gradientArray, fullTempPathDir);
+    }
+
+    function exportSpatialGEOJSONWrapper(){
+      exportSpatialGEOJSON(fullTempPathDir);
+    }
+
+    function exportFullOutputExcelWrapper(){
+      exportFullOutputExcel(fullTempPathDir);
+    }
+
+    function getNrows(){
+      for (var r = 1; r < 100; r++){
+        if(document.getElementById("name_row" + r)==null){
+          break
+        }
+      }
+      r--;
+      return r;
+    }
+
+    // r functions wrappers
+    function runEPIEWrapper(){
+
+      // button activity indication
+      let btnSelector = "run_epie_btn";
+      let cmd_activity = "cmd_out";
+      document.getElementById(cmd_activity).innerText = ""; // clear
+      document.getElementById("myBar").style.width = 0 + "%";
+
+      console.log("---------------------------");	
+      console.log("runEPIEWrapper");	
+      console.log("---------------------------");	
+
+      // debugging dont write new data to tmp dir continue with previous run
+      var debugging = false;
+
+      // file paths and parameters
+      let tmp_csv_fullpath_apiProp = "";
+      let tmp_csv_fullpath_cons = "";
+      let tmp_csv_fullpath_rmFrac = "";
+      let flowCondition = "Average";
+      let basinIDs = selected_basins.join(",");
+      basinIDs = "c(" + basinIDs + ")";
+      console.log("Basin IDs:",basinIDs);
+
+      if(!debugging) {
+        // gather inputs 
+        // (1) API properties
+        tmp_csv_fullpath_apiProp = tableToCSV(fullTempPathDir,"API_run.csv");
+        console.log("API in:",tmp_csv_fullpath_apiProp);
+        // (2) basin selection
+        if(selected_basins.length == 0){
+          console.log("No basins selected");
+          dialog.showMessageBox({
+            title: "No basins selected",
+            message: 'No basins selected, please select at least one basin to run the model',
+            buttons: ['OK']
+          })
+          return;
+        }
+
+        // (3) Consumption data
+        let rowsCons = document.querySelectorAll("#API_table_consumption > tbody > tr");
+        if(rowsCons.length==0) {
+          console.log("No consumption data available");
+          dialog.showMessageBox({
+            title: "No consumption data provided",
+            message: 'No consumption data available, please generate consumption data first',
+            buttons: ['OK']
+          })
+          return;
+        }
+        if(rowsCons.length>0) {
+          let empty = false;
+          for(let i = 0; i < (rowsCons.length); i++){
+            let cell = rowsCons[i].lastElementChild.firstElementChild;
+            if(cell.value==""){
+              empty = true;
+              break;
+            }
+          }
+          if(empty){
+            console.log("Consumption data incomplete");
+            dialog.showMessageBox({
+              title: "Consumption data incomplete",
+              message: 'Please complete the consumption data table before running the model',
+              buttons: ['OK']
+            })
+            return;
+          }
+        }
+        tmp_csv_fullpath_cons = tableConsToCSV(fullTempPathDir,"Cons_run.csv");
+        console.log("Basin IDs:",tmp_csv_fullpath_cons);
+
+        // (4) Flow condition
+        flowCondition = document.querySelector("#flow").value;
+        console.log("flowCondition:",flowCondition);
+
+        // (5) Get removal fractions
+        tmp_csv_fullpath_rmFrac = tableRmFracToCSV(fullTempPathDir,"RmFrac_run.csv");
+        console.log(tmp_csv_fullpath_rmFrac)
+        let primRM = document.querySelector("#primaryFrac_row1").value;
+        let secRM = document.querySelector("#secondaryFrac_row1").value;
+        let primNaN = isNaN(parseFloat(primRM))
+        let secNaN = isNaN(parseFloat(secRM))
+        if(primNaN || secNaN) {
+          console.log("No numeric value for primary and/or secondary removal fraction");
+          dialog.showMessageBox({
+            title: "Removal fractions not set",
+            message: 'Please set the primary and secondary removal fractions before running the model',
+            buttons: ['OK']
+          })
+          return;
+        }
+
+      }else{
+        // debugging
+        tmp_csv_fullpath_apiProp = fullTempPathDir+"/API_run.csv";
+        tmp_csv_fullpath_cons = fullTempPathDir+"/Cons_run.csv";
+        tmp_csv_fullpath_rmFrac = fullTempPathDir+"/RmFrac_run.csv";
+        flowCondition = "Average";
+        basinIDs = "c(107287)";
+        console.log("Basin IDs:",basinIDs);
+      }
+
+
+      // compile data request vector for basin data access
+      let dataRequestVector = "c(pts,hl,avg)"
+      if(flowCondition == "Min") dataRequestVector = "c(pts,hl,mi)" // consumption
+      if(flowCondition == "Max") dataRequestVector = "c(pts,hl,ma)" // consumption
+      console.log("dataRequestVector:",dataRequestVector);
+
+
+      const promise = new Promise((resolve, reject) => {
+        let acccessresult = AccessBasinDB(basinIDs, fullBasinResourceDir, dataRequestVector, fullTempPathDir, btnSelector, cmd_activity);
+        if (acccessresult) {
+          resolve(acccessresult);
+        } else {
+          reject(acccessresult);
+        }
+      })
+
+      promise.then(res => {
+        console.log("Basin data access succesful PROMISE!!!!!!!!!!!!",res);
+          // run the ePiE model (js)
+          RunModelePiE(tmp_csv_fullpath_apiProp, tmp_csv_fullpath_cons, basinIDs, flowCondition, tmp_csv_fullpath_rmFrac, fullTempPathDir, btnSelector, cmd_activity);
+          
+      }).catch(err => {
+          console.log("Basin data access failed",err);
+          //return false; 
+      })
+
+      // // run the ePiE model
+      // run_ePiE_pyexec(fullPyExecPath_run_ePiE, tmp_csv_fullpath_apiProp, tmp_csv_fullpath_cons, basinIDs, flowCondition, tmp_csv_fullpath_rmFrac,
+      //                 fullPyExecPath_run_basinDataAccess, fullBasinResourceDir, fullTempPathDir);
+
+      // map API ID copy
+      let r = getNrows();
+      let API_ids = [];
+      for (let i = 1; i <= r; i++) API_ids.push(document.getElementById("name_row" + i).value);
+      console.log("API_ids: ", API_ids);
+      for (let i = 1; i <= r; i++) {
+        document.querySelector("#Map_results > #API_map_selection > option").innerHTML = API_ids[i-1];
+        document.querySelector("#Basin_result_stats > #API_map_selection > option").innerHTML = API_ids[i-1];
+        document.querySelector("#PNEC_Map_results > #API_map_selection > option").innerHTML = API_ids[i-1];
+      }
+
+
+    }
+    
+
+    function openTabWrapper(evt, tabName){
+
+      // check if tab is locked
+      console.log("locked: " + tabName + " = " + lockedTabs[tabName]);
+
+      // open tab if it is not locked
+      if(!lockedTabs[tabName]){
+        openTab(evt, tabName);
+
+        // create the basin map if the basin tab is opened
+        console.log("basinMapCreated: " + basinMapCreated);
+        if(tabName == 'Basin_select'){
+          createBasinMap(selected_basins,selected_basins_names);
+          basinMapCreated = true;
+        }
+        // if(tabName == 'Basin_select' && !basinMapCreated){
+        //   createBasinMap(selected_basins,selected_basins_names);
+        //   basinMapCreated = true;
+        // }
+      }
+
+      // check if in edit mode
+      let c1 = document.querySelector("#save").style.display != "none";
+      let c2 = document.querySelector("#save2").style.display != "none";
+      let c3 = document.querySelector("#save3").style.display != "none";
+      let c4 = document.querySelector("#save4").style.display != "none";
+      if(c1 | c2 | c3 | c4){
+        saveTabValues();
+      }
+      
+
+    }
+
+    function getFlowSelection(){
+      let val = document.querySelector("#flow").value;
+      console.log(val);
+      
+      let elem = document.querySelector("#prnt_slct_flow");
+      elem.innerText = "";
+      
+      if(val == "Average"){
+        elem.innerText = `Average`;
+      }else if(val == "Min"){
+        elem.innerText = `Minimum`;
+      }else if(val == "Max"){
+        elem.innerText = `Maximum`;
+      }else{
+        elem.innerText = `Average`;
+      }
+
+    }
+
+    function setPopulationYear(){
+      let val = document.querySelector("#pop_year").value;
+      console.log(val);
+      let elem = document.querySelector("#pop_year_value_holder");
+      elem.innerText = val;
+
+      // calculate API total kg cons per country if value is set
+      var percapfield = document.querySelector("#cPercapitaValue_row1");
+      if(percapfield!=null){
+        let val = percapfield.value;
+        console.log(val);
+        if(val!=""){
+          let percapitakg = parseFloat(val)/1000.00;
+          console.log(percapitakg);
+
+          let countriesPop = getCountriesConsPop();
+          console.log(countriesPop);
+
+          for(let i = 0; i < countriesPop.countries.length; i++){
+            let country = countriesPop.countries[i];
+            let selector = countriesPop.selectors[i];
+            selector = selector.replace("c_row","api1_row");
+            let pop = countriesPop.poparray[i];
+            console.log(country,selector,pop);
+            let cons = (percapitakg * pop).toFixed(3);
+            console.log(cons);
+            //if(document.querySelector(selector).value===""){
+              document.querySelector(selector).value = cons;
+            //}
+          }
+
+        }
+      }
+    }
+
+    function selectConsDataType(){
+
+      // get selection
+      let val = document.querySelector("#cons_data_type").value;
+      console.log(val);
+
+      // check if current cons table is empty or not 
+      let tableempty = document.querySelector("#API_table_consumption").innerHTML === "<tbody></tbody>"
+
+      // chaning the cons data option will clear the current table
+      if(!tableempty){
+        console.log("Table not empty");
+        dialog.showMessageBox({
+          title: "Warning",
+          message: 'Please note that changing the consumption data type will remove all current consumption data from the table\n\nAre you sure you want to continue?',
+          buttons: ['OK','CANCEL']
+        }).then(({ response }) => {
+          if(response === 0){
+            // set the value to a holder div
+            let elem = document.querySelector("#cons_data_type_value_holder");
+            elem.innerText = val;
+            
+            // remove current edit buttons
+            document.querySelector("#cons_edit_buttons").style.display = "none";
+            document.querySelector("#consHeaderHoverInfo").style.display = "none";
+
+            // remove contents current table if selection is changed
+            document.querySelector("#API_table_consumption").innerHTML = "<tbody></tbody>";
+            document.querySelector("#API_table_consumption_avg_per_capita").innerHTML = "<tbody></tbody>";
+            document.querySelector("#avg_per_capita_cons_table").style.display = "none";
+            document.querySelector("#div_container_pop_year").style.display = "none";
+          }else{
+            console.log('CANCEL');
+          }
+        });
+      }else{
+        // set the value to a holder div
+        let elem = document.querySelector("#cons_data_type_value_holder");
+        elem.innerText = val;
+      }
+
+    }
+
+    function getExcelAPIDataTemplateWrapper(){
+      getExcelAPIDataTemplate(APIExcelTemplateFullPath);
+    }
+
+    function CalculateBasinStatisticsWrapper() {
+      CalculateBasinStatistics(fullTempPathDir);
+    }
+
+
+    function OpenCloseCollapsible(id_use) {
+
+      var content = document.getElementById(id_use);
+      if (content.style.display === "block") {
+      content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+
+    }
+
+    function notYetDeveloped(){
+      console.log("This feature is not yet developed");
+      let btnname = event.target.innerHTML;
+      console.log(btnname);
+    
+      dialog.showMessageBox({
+        title: btnname,
+        message: btnname + ' button clicked, this function requires further development',
+        buttons: ['OK']
+      })
+    }
+
+    function runSimpleTreat4(){
+      
+      console.log("runSimpleTreat4");
+      
+      // check if the api table is empty
+      let check = false;
+      let tf1 = document.querySelector("#API_properties").getElementsByClassName("tableField");
+      let tf2 = document.querySelector("#API_properties").getElementsByClassName("tableField2");
+      let tf3 = document.querySelector("#API_properties").getElementsByClassName("tableField2alt");
+      for (let index = 0; index < tf1.length; index++) {
+        if(tf1[index].value === "") check = true;
+      }
+      for (let index = 0; index < tf2.length; index++) {
+        if(tf2[index].value === "") check = true;
+      }
+      for (let index = 0; index < tf3.length; index++) {
+        if(tf3[index].value === "") check = true;
+      }
+      console.log("API table NA check: ",check);
+      
+      // quite function if check is true
+      if(check){
+        dialog.showMessageBox({
+          title: "API properties incomplete",
+          message: 'Please complete the API properties in Table 2 before running SimpleTreat4.0',
+          buttons: ['OK']
+        })
+        return;
+      }
+      
+      // gather inputs for SimpleTreat4.0 (write chem data as csv)
+      let tmp_csv_fullpath = tableToCSV(fullTempPathDir,"API_run.csv");
+      console.log("API in:",tmp_csv_fullpath);
+      
+      // run SimpleTreat4.0 (js)
+      let out = SimpleTreat4_0(tmp_csv_fullpath,0);
+      console.log("SimpleTreat4_0 js out:",out);
+      
+      // fill in primary and secondary removal fractions table
+      let remPrimFloat = out.remPrim;
+      let remSecFloat = out.remSec;
+      let pf = remPrimFloat; //0.031;
+      let sf = remSecFloat; //0.813;
+      pf = Math.round(pf*100000)/100000.00;
+      sf = Math.round(sf*100000)/100000.00;
+      let div1 = document.getElementById("primaryFrac_row1");
+      let div2 = document.getElementById("secondaryFrac_row1");
+      div1.value = pf;
+      div2.value = sf;
+      div1.setAttribute('value',pf); 
+      div2.setAttribute('value',sf); 
+      div1.style.color = "#ff9000";
+      div2.style.color = "#ff9000";
+    
+    }
+
+    function run_generateConsumptionTableInner(){
+
+      document.querySelector("#progress_gen_table_cons").style.display = "inline-block";
+      
+      if(selected_basins.length == 0){
+        console.log("No basins selected");
+        dialog.showMessageBox({
+          title: "No basins selected",
+          message: 'No basins selected, please select at least one basin to generate the consumption data table',
+          buttons: ['OK']
+        })
+        document.querySelector("#progress_gen_table_cons").style.display = "none";
+        return;
+      }
+
+      let out = generateConsumptionTable(fullBasinResourceDir, fullTempPathDir, selected_basins);
+      console.log(out);
+    
+      
+      // let tmp_csv_fullpath = tableToCSV(fullTempPathDir,"Cons_CountriesWWTP.csv");
+      // console.log("tmp_csv_fullpath: ",tmp_csv_fullpath);
+      // let succes = false;
+      // succes = run_generateConsumptionTable_pyexec(fullPyExecPath_generateConsCountries, fullPyExecPath_run_basinDataAccess,
+      //                                              tmp_csv_fullpath, fullBasinResourceDir, fullTempPathDir);
+      // console.log("run_generateConsumptionTableInner succes: ",succes);
+      
+      let test = populationPerCapConversion("NL",2024);
+      console.log("test: ",test);
+      let countries = getCountriesConsPop();
+      console.log(countries);
+
+      // show loading info
+      if(out==1) document.querySelector("#cons_edit_buttons").style.display = "inline-block";
+      document.querySelector("#progress_gen_table_cons").style.display = "none";
+
+    }
+
+    function run_generateConsumptionTableWrapper(){
+
+      console.log("run_generateConsumptionTableWrapper");
+
+      // check if current cons table is empty or not 
+      let tableempty = document.querySelector("#API_table_consumption").innerHTML === "<tbody></tbody>"
+      if(!tableempty) console.log("Table not empty");
+      run_generateConsumptionTableInner();
+      copyOverAPI_ID();
+
+ 
+    }
+
+
+
+    return {
+      path,
+      open,
+      back,
+
+      loadExcelData,
+      getExcelAPIDataTemplateWrapper,
+      addAPItableRow,
+      removeLastAPItableRow,
+
+      editTabValues,
+      saveTabValues,
+      
+      runEPIEWrapper,
+      runAPICompleteWrapper,
+      run_generateConsumptionTableWrapper,
+
+      openTabWrapper,
+      OpenCloseCollapsible,
+      createOutputMapWrapper,
+      createPNECOutputMapWrapper,
+      createBasinMapWrapper,
+      exportSpatialGEOJSONWrapper,
+      exportFullOutputExcelWrapper,
+
+      runSimpleTreat4,
+
+      getFlowSelection,
+      selectConsDataType,
+      setPopulationYear,
+
+      CalculateBasinStatisticsWrapper,
+
+      notYetDeveloped,
+
+      files,
+      searchString,
+      filteredFiles, 
+
+      setAppVersion
+    }
+  }
+}
+</script>

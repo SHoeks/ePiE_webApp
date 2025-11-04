@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="favicon.ico">
+
+    <title>TMP</title>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> -->
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="css/leaflet.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+
+    <!-- global variables -->
+    <script>
+      
+      // current tab
+      var current_tab = 'Welcome_screen';
+      
+      // global setup var
+      var selected_basins = [];
+      var selected_basins_names = [];
+      selected_basins.splice(0,selected_basins.length)
+      selected_basins_names.splice(0,selected_basins_names.length)
+      var basinMapCreated = false;
+
+      //var lockedTabs = {Welcome_screen: true, File_browser: true, API_properties: true, Basin_select: true, Run_process: true, Map_results: true};
+      var lockedTabs = {Welcome_screen: false, File_browser: false, API_properties: false, Basin_select: false, Run_process: false, Map_results: false};
+      lockedTabs['Welcome_screen'] = false;
+
+    </script>
+
+    <!-- interface helper functions -->
+    <script src="assets/_openTab.js"></script>
+    <script src="assets/_copyOverAPI_ID.js"></script>
+    <script src="assets/_copyOverAPI_ID.js"></script>
+    <script src="assets/_saveTabValues.js"></script>
+
+    <!-- epie functions -->
+    <script src="epie/_createBasinMap.js"></script>
+    <script src="epie/_CompleteChemProperties.js"></script> !!!???//// continue here!
+
+    <!-- local epie data -->
+    <script src="data/basin_geo/Basin.js"></script>
+     
+
+  </head>
+<body>
+
+
+  <div class="tab">
+    <button id="tablink_Welcome_screen" class="tablinks"
+      onclick="openTabWrapper(event, 'Welcome_screen')">Welcome</button>
+    <!-- <button id="tablink_File_browser" class="tablinks" onclick="openTabWrapper(event, 'File_browser')">File Browser</button> -->
+    <button id="tablink_API_properties" class="tablinks" onclick="openTabWrapper(event, 'API_properties')">API
+      properties</button>
+    <button id="tablink_Degradation_select" class="tablinks" onclick="openTabWrapper(event, 'Degradation')">WWTP
+      removal</button>
+    <button id="tablink_Basin_select" class="tablinks" onclick="openTabWrapper(event, 'Basin_select')">River
+      basin</button>
+    <button id="tablink_Consumption_select" class="tablinks" onclick="openTabWrapper(event, 'Consumption')">Consumption
+      data</button>
+    <button id="tablink_Run_process" class="tablinks" onclick="openTabWrapper(event, 'Run_process')">Run ePiE</button>
+    <button id="tablink_Map_results" class="tablinks" onclick="openTabWrapper(event, 'Map_results')">Map
+      results</button>
+    <button id="tablink_Basin_result_stats" class="tablinks"
+      onclick="openTabWrapper(event, 'Basin_result_stats')">Output Statistics</button>
+    <button id="tablink_PNEC_Map_results" class="tablinks" onclick="openTabWrapper(event, 'PNEC_Map_results')">Map
+      Risks</button>
+  </div>
+
+  <div class="tabbuffer"></div>
+
+  <div id="Welcome_screen" class="tabcontent">
+
+    <h3>Welcome to ePiE</h3>
+    <p style="margin-bottom: 16px; max-width: 1250px;">ePiE is a spatially explicit model that estimates concentrations
+      of
+      active pharmaceutical ingredients (APIs) in surface waters across Europe (<a
+        href="https://pubs.acs.org/doi/10.1021/acs.est.8b03862" target="_blank">Oldenkamp et al. 2018</a>).
+      Based on relatively few data entries such as national consumption data, compound properties and environmental fate
+      parameters,
+      the ePiE model estimates average pharmaceutical concentrations in European river catchments.
+      This application was developed by Selwyn Hoeks at Radboud University supported by the PREMIER project to
+      facilitate the use of the ePiE model.
+    </p>
+
+    <div style="height: 8px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 8px;"></div>
+
+    <h4>Instructions</h4>
+
+    <p>By clicking through the different tabs at the top of the page, you can parameterize and run the ePiE model. For
+      defining the API properties there are two options:</p>
+    <!-- <p><b>Contact details:</b> selwyn.hoeks@ru.nl</p> -->
+    <ul>
+      <li>You can make use of a pre-defined list of APIs for which the model is already parametrized (see <a
+          href="https://pubs.acs.org/doi/10.1021/acs.est.8b03862" target="_blank">Oldenkamp et al. 2018</a>)</li>
+      <li>You can parametrize the model yourself for new APIs by providing the required data entries. </li>
+    </ul>
+
+    <p style="margin-bottom:0px;">A comprehensive manual can be found here: <a
+        href="https://shoeks.github.io/static_html/workinprogress.html" target="_blank">manual</a></p>
+    <p>More details about the model equations can be found here: <a
+        href="https://pubs.acs.org/doi/abs/10.1021/acs.est.8b03862" target="_blank">technical details</a></p>
+
+    <div style="height: 8px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 8px;"></div>
+
+    <!-- 
+  <h4>News</h4>
+  <p>News updates would go here. For example new features or bug fixes.</p>
+  <ul>
+    <li>Update 1.091: New features added xxx, xxx</li>
+    <li>Update 1.090: Bug fixes (xxx)</li>
+    <li>Update 1.089: New features added xxx</li>
+  </ul>
+  
+  <div style="height: 8px;"></div>
+  <hr> 
+  <div style="height: 8px;"></div>
+  -->
+
+    <h4>Update ePiE</h4>
+
+    <p>Please check the following link to check if a more recent version is available:
+      <a href="https://shoeks.github.io/ePiE_desktopApp/" target="_blank">check for updates</a>
+    </p>
+
+    <p style="margin-bottom: 2px;">Current version: <b id="appversionbox" onload="setAppVersion()">vvv</b></p>
+    <!-- <p>Current ePiE model version: <b>1.20</b></p> -->
+
+    <div style="height: 20px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 10px;"></div>
+
+    <h4>Questions & support</h4>
+    For any questions, please contact Selwyn Hoeks (selwyn.hoeks@ru.nl).
+
+  </div>
+
+  <div id="File_browser" class="tabcontent">
+    <div class="container mt-2">
+      <h4>{{ path }}</h4>
+
+      <div class="form-group mt-4 mb-2">
+        <input v-model="searchString" class="form-control form-control-sm" placeholder="File search" />
+      </div>
+
+      <FilesViewer :files="filteredFiles" :nested="nested" @back="back" @folderclick="open($event.name)" />
+    </div>
+  </div>
+
+  <div id="API_properties" class="tabcontent">
+
+    <h3>API properties</h3>
+    <!-- <p>API specific physicochemical and environmental fate parameters can be entered here (using the tables below). Alternatively, API parameters can be loaded from an Excel file. An Excel template can be retrieved from the button below.</p> -->
+    <p style="max-width: 1250px;">
+      In this tab, the API's physicochemical properties as well as fate properties need to be specified.
+      API properties can be entered manually using the tables below or loaded from an Excel file. An Excel template with
+      the values for 36 example APIs can be retrieved from the button 'Get Excel template'.
+      The Excel template includes a pre-defined list of APIs for which the model is already parametrized, these can be
+      used directly, modified or replaced by new APIs.
+      <!-- In addition, the Excel template includes a metadata sheet with explanations for each parameter as well as the corrosponding unit. -->
+    </p>
+    <h4>Instructions:</h4>
+    <ol style="max-width: 800px;">
+      <li>For a new API you need to provide at least input values for Table 1 (compound properties), either fill them
+        manually using the "Edit table" button or load the parameters from an Excel file.</li>
+      <li>Values specified in Table 2 (fate parameters) can be filled when known or estimated using build-in QSARs by
+        clicking the 'Calculate default values' button above Table 2.</li>
+    </ol>
+    <p>
+      All values need to be filled in both tables need to be filled to continue.
+    </p>
+
+    <!-- <p style="margin-top: 10px; margin-bottom: 0px;">Initial API properties</p> -->
+    <div style="margin-bottom: 1px;">
+      <button type="button" class="action_button" onclick="getExcelAPIDataTemplateWrapper()">Get Excel template</button>
+      <button type="button" class="action_button" onclick="loadExcelData()">Read Excel data</button>
+    </div>
+
+    <div style="height: 5px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 10px;"></div>
+
+
+    <h4>Table 1 - API properties</h4>
+    <p>Please hover over the table headers to get an explanation of each parameter.</p>
+
+    <div style="margin-bottom: 1px;">
+      <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
+      <button type="button" class="action_button" id="save" onclick="saveTabValues()">Save table</button>
+      <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
+      <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
+    </div>
+
+    <form class="API_table_form" id="form_table1_chem">
+      <table id="API_table" cellspacing="0" cellpadding="4">
+        <tbody>
+          <tr>
+            <th class="api tableHeader"> <span class="firstSpan">API<br>
+                <p>(id)</p><span class="secondSpan">Name of the active pharmaceutical ingredient (API)</span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">CAS<br>
+                <p>(number)</p><span class="secondSpan">CAS number</span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">class<br>
+                <p>(neutral/acid/base)</p><span class="secondSpan">Chemical class of the API <p class="hover_unit">
+                    (neutral/acid/base)</p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">MW<br>
+                <p>(g/mol)</p><span class="secondSpan">Molecular weight (for APIs that are salts: preferably enter
+                  molecular weight of free acid/base) <p class="hover_unit">(g/mol)</p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">KOW_n<br>
+                <p>(-)</p><span class="secondSpan">Octanol/water partitioning coefficient of the neutral form<p
+                    class="hover_unit">-</p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">Pv<br>
+                <p>(Pa)</p><span class="secondSpan">Vapour pressure at 25 °C <p class="hover_unit">Pa</p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">S<br>
+                <p>(mg/L)</p><span class="secondSpan">Solubility in water at 25 °C <p class="hover_unit">mg/L</p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">pKa<br>
+                <p>(-)</p><span class="secondSpan">Acid dissociation coefficient <p class="hover_unit">-</p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">f_uf<br>
+                <p>(-)</p><span class="secondSpan">Fraction of dose excreted unchanged via urine <p class="hover_unit">-
+                  </p></span>
+              </span> </th>
+            <th class="api tableHeader"> <span class="firstSpan">k_bio_wwtp<br>
+                <p>(-)</p><span class="secondSpan">First order biodegradation rate constant for secondary treatment <p
+                    class="hover_unit">-</p></span>
+              </span> </th>
+            <!-- <th class="api tableHeader">metab</th>
+          <th class="api tableHeader">API_metab</th> -->
+          </tr>
+          <tr>
+            <td><input style="width: 120px;" class="tableField" type="text" id="name_row1" value="Ibuprofen" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="cas_row1" value="15687-27-1" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="class_row1" value="acid" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="MW_row1" value="206.2808" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="KOW_n_row1" value="9332.543" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="Pv_row1" value="0.0248" readonly /></td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="S_row1" value="21" readonly /></td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="pKa_row1" value="4.85" readonly /></td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="f_u_row1" value="0.2" readonly /></td>
+            <td><input style="width: 120px;" class="tableField" type="text" id="f_f_row1" value="0.0" readonly /></td>
+            <!-- <td><input style="width: 100px;" class="tableField" type="text" id="metab_1" value="0" readonly /></td>
+        <td><input style="width: 100px;" class="tableField" type="text" id="API_metab_1" value="" readonly /></td> -->
+          </tr>
+        </tbody>
+      </table>
+    </form>
+
+    <div style="height: 20px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 10px;"></div>
+
+    <h4>Table 2 - API-specific fate parameters</h4>
+    <!-- <p>tabcontent.</p> -->
+    <!-- <p style="margin-top: 40px; margin-bottom: 0px;">Complete API properties</p> -->
+    <!-- <p style="margin-top: 10px; margin-bottom: 0px;">Derived API properties</p> -->
+
+    <div style="margin-bottom: 1px;">
+      <button id="runAPIcompletebtn" type="button" class="action_button" onclick="runAPICompleteWrapper()">Calculate
+        default values</button>
+      <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
+      <button type="button" class="action_button" id="save2" onclick="saveTabValues()">Save table</button>
+      <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
+      <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
+    </div>
+
+    <form class="API_table_form" id="form_table2_chem">
+      <table id="API_table2" cellspacing="0" cellpadding="4">
+        <tbody>
+          <tr>
+            <!-- Kp_ps; Kp_as;	Kp_susp; Kp_sd;	KOC;	k_bio_wwtp;	k_bio_sw1;	T_bio_sw;	k_bio_sd1;	T_bio_sd; k_hydro_sw;	T_hydro_sw;	k_hydro_sd;	T_hydro_sd;	lambda_solar;	k_photo12_sw;  -->
+
+            <th class="api2 tableHeader2"> <span class="firstSpan">API<br>
+                <p>(id)</p><span class="secondSpan"> Name of the active pharmaceutical ingredient (API) </span>
+              </span> </th>
+            <!--<th class="api2 tableHeader2"> <span class="firstSpan">KOW_n<br><p>(-)</p><span class="secondSpan">Octanol/water partitioning coefficient of the neutral form<p class="hover_unit">-</p></span></span> </th> -->
+            <th class="api2 tableHeader2"> <span class="firstSpan">Kp_ps_n<br>
+                <p>(L/kg)</p><span class="secondSpan">Sewage-solids water partitioning coefficient of neutral form <p
+                    class="hover_unit">L water/kg solids</p></span>
+              </span> </th>
+            <th class="api2 tableHeader2"> <span class="firstSpan">Kp_as_n<br>
+                <p>(L/kg)</p><span class="secondSpan">Activated sludge-solids water partitioning coefficient of neutral
+                  form <p class="hover_unit">L water/kg solids</p></span>
+              </span> </th>
+            <th class="api2 tableHeader2"> <span class="firstSpan">Kp_sd_n<br>
+                <p>(L/kg)</p><span class="secondSpan">Sediment-solids water partitioning coefficient of neutral form <p
+                    class="hover_unit">L water/kg solids</p></span>
+              </span> </th>
+            <th class="api2 tableHeader2"> <span class="firstSpan">KOC_n<br>
+                <p>(-)</p><span class="secondSpan"> ... <p class="hover_unit">...</p></span>
+              </span> </th>
+
+            <!-- <th class="api2 tableHeader2"> <span class="firstSpan">k_bio_wwtp_n<br><p>(s-1)</p><span class="secondSpan">First order biodegradation rate constant secondary treatment of neutral form <p class="hover_unit">s-1</p></span></span> </th> -->
+            <!-- <th class="api2 tableHeader2"> <span class="firstSpan">k_bio_sw1_n<br><p>(s-1)</p><span class="secondSpan">Pseudo-first order experimental biodegradation rate constant in surface water of neutral form <p class="hover_unit">s-1</p></span></span> </th>-->
+            <!-- <th class="api2 tableHeader2"> <span class="firstSpan">T_bio_sw_n<br><p>(K)</p><span class="secondSpan">Temperature at which kbio in surface water was derived of neutral form <p class="hover_unit">K</p></span></span> </th> -->
+            <!-- <th class="api2 tableHeader2"> <span class="firstSpan">k_hydro_sw_n<br><p>(s-1)</p><span class="secondSpan">First order experimental hydrolysis rate constant in surface water of neutral form <p class="hover_unit">s-1</p></span></span> </th> -->
+            <!-- <th class="api2 tableHeader2"> <span class="firstSpan">T_hydro_sw_n<br><p>(K)</p><span class="secondSpan">Temperature at which khydro in surface water was derived of neutral form <p class="hover_unit">K</p></span></span> </th> -->
+
+            <!-- <th class="api2 tableHeader2"> <span class="firstSpan">lambda_solar_n<span class="secondSpan">... <p class="hover_unit">... </p></span></span> </th>
+          <th class="api2 tableHeader2"> <span class="firstSpan">k_photo12_sw_n<span class="secondSpan">... <p class="hover_unit">... </p></span></span> </th>
+          <th class="api2 tableHeader2"> <span class="firstSpan">T_photo12_sw_n<span class="secondSpan">... <p class="hover_unit">K</p></span></span> </th> -->
+
+          </tr>
+          <tr>
+
+            <td><input style="width: 120px;" class="tableField2" type="text" id="API_ID_tab2_row1" value="" readonly />
+            </td>
+            <!--<td><input style="width: 120px;" class="tableField2" type="text" id="KOW_n_row1" value="" readonly /></td>-->
+            <td><input style="width: 120px;" class="tableField2" type="text" id="Kp_ps_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;" class="tableField2" type="text" id="Kp_as_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;" class="tableField2" type="text" id="Kp_sd_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;" class="tableField2" type="text" id="KOC_n_row1" value="" readonly /></td>
+            <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="k_bio_wwtp_n_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="k_bio_sw1_n_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="T_bio_sw_n_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="k_hydro_sw_n_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="T_hydro_sw_n_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="lambda_solar_n_row1" value="" readonly /></td>
+        <td><input style="width: 120px;" class="tableField2" type="text" id="k_photo12_sw_n_row1" value="" readonly /></td>
+        <td><input style="width: 120px;" class="tableField2" type="text" id="T_photo12_sw_n_row1" value="" readonly /></td> -->
+
+          </tr>
+        </tbody>
+      </table>
+    </form>
+
+
+
+    <form class="API_table_form" id="form_table2alt_chem">
+      <table id="API_table2alt" cellspacing="0" cellpadding="4">
+        <tbody>
+          <tr>
+            <!-- Kp_ps; Kp_as;	Kp_susp; Kp_sd;	KOC;	k_bio_wwtp;	k_bio_sw1;	T_bio_sw;	k_bio_sd1;	T_bio_sd; k_hydro_sw;	T_hydro_sw;	k_hydro_sd;	T_hydro_sd;	lambda_solar;	k_photo12_sw;  -->
+
+            <th class="api2 tableHeader2alt"> <span class="firstSpan">API<br>
+                <p>(id)</p><span class="secondSpan"> Name of the active pharmaceutical ingredient (API) </span>
+              </span> </th>
+            <th class="api2alt tableHeader2alt"> <span class="firstSpan">KOW_alt<br>
+                <p>(-)</p><span class="secondSpan">Octanol/water partitioning coefficient of the alternative form<p
+                    class="hover_unit">-</p></span>
+              </span> </th>
+            <th class="api2alt tableHeader2alt"> <span class="firstSpan">Kp_ps_alt<br>
+                <p>(L/kg)</p><span class="secondSpan">Sewage-solids water partitioning coefficient of alternative form
+                  <p class="hover_unit">L water/kg solids</p></span>
+              </span> </th>
+            <th class="api2alt tableHeader2alt"> <span class="firstSpan">Kp_as_alt<br>
+                <p>(L/kg)</p><span class="secondSpan">Activated sludge-solids water partitioning coefficient of
+                  alternative form <p class="hover_unit">L water/kg solids</p></span>
+              </span> </th>
+            <th class="api2alt tableHeader2alt"> <span class="firstSpan">Kp_sd_alt<br>
+                <p>(L/kg)</p><span class="secondSpan">Sediment-solids water partitioning coefficient of alternative form
+                  <p class="hover_unit">L water/kg solids</p></span>
+              </span> </th>
+            <th class="api2alt tableHeader2alt"> <span class="firstSpan">KOC_alt<br>
+                <p>(-)</p><span class="secondSpan"> ... <p class="hover_unit">...</p></span>
+              </span> </th>
+
+
+            <!-- <th class="api2alt tableHeader2alt"> <span class="firstSpan">k_bio_wwtp_alt<br><p>(s-1)</p><span class="secondSpan">First order biodegradation rate constant secondary treatment of alternative form <p class="hover_unit">s-1</p></span></span> </th> -->
+            <!-- <th class="api2alt tableHeader2alt"> <span class="firstSpan">k_bio_sw1_alt<br><p>(s-1)</p><span class="secondSpan">Pseudo-first order experimental biodegradation rate constant in surface water of alternative form <p class="hover_unit">s-1</p></span></span> </th> -->
+            <!-- <th class="api2alt tableHeader2alt"> <span class="firstSpan">T_bio_sw_alt<br><p>(K)</p><span class="secondSpan">Temperature at which kbio in surface water was derived of alternative form <p class="hover_unit">K</p></span></span> </th> -->
+            <!-- <th class="api2alt tableHeader2alt"> <span class="firstSpan">k_hydro_sw_alt<br><p>(s-1)</p><span class="secondSpan">First order experimental hydrolysis rate constant in surface water of alternative form <p class="hover_unit">s-1</p></span></span> </th> -->
+            <!-- <th class="api2alt tableHeader2alt"> <span class="firstSpan">T_hydro_sw_alt<br><p>(K)</p><span class="secondSpan">Temperature at which khydro in surface water was derived of alternative form <p class="hover_unit">K</p></span></span> </th> -->
+
+            <!-- <th class="api2alt tableHeader2alt"> <span class="firstSpan">lambda_solar_n<span class="secondSpan">... <p class="hover_unit">... </p></span></span> </th>
+          <th class="api2alt tableHeader2alt"> <span class="firstSpan">k_photo12alt_sw_n<span class="secondSpan">... <p class="hover_unit">... </p></span></span> </th>
+          <th class="api2alt tableHeader2alt"> <span class="firstSpan">T_photo12alt_sw_n<span class="secondSpan">... <p class="hover_unit">K</p></span></span> </th> -->
+
+          </tr>
+          <tr>
+
+            <td><input style="width: 120px;" class="tableField2alt" type="text" id="API_ID_tab2alt_row1" value=""
+                readonly /></td>
+            <td><input style="width: 120px;" class="tableField2alt" type="text" id="KOW_alt_row1" value="" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField2alt" type="text" id="Kp_ps_alt_row1" value="" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField2alt" type="text" id="Kp_as_alt_row1" value="" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField2alt" type="text" id="Kp_sd_alt_row1" value="" readonly />
+            </td>
+            <td><input style="width: 120px;" class="tableField2alt" type="text" id="KOC_alt_row1" value="" readonly />
+            </td>
+            <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="k_bio_wwtp_alt_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="k_bio_sw1_alt_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="T_bio_sw_alt_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="k_hydro_sw_alt_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="T_hydro_sw_alt_row1" value="" readonly /></td> -->
+            <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="lambda_solar_alt_row1" value="" readonly /></td>
+        <td><input style="width: 120px;" class="tableField2alt" type="text" id="k_photo12_sw_alt_row1" value="" readonly /></td>
+        <td><input style="width: 120px;" class="tableField2alt" type="text" id="T_photo12_sw_alt_row1" value="" readonly /></td> -->
+
+          </tr>
+        </tbody>
+      </table>
+    </form>
+
+    <!-- <div style="margin-bottom: 2px;margin-top: 10px;">
+    <button type="button" class="action_button" onclick="OpenCloseCollapsible('api_tab2_prop_info')">More information</button>
+    <div id="api_tab2_prop_info" class="collapsible_content">
+    <p>Needs further work:</p>
+    <p><b>Kp_ps_n</b> explanation...</p>
+    <p><b>Kp_as_n</b> explanation...</p>
+    <p><b>Kp_sd_n</b> explanation...</p>
+    <p>Source: ...</p>
+    </div>
+  </div> -->
+
+    <div class="debugging" style="background-color: #999999; margin-top: 10px;">
+      <div style="height: 0px;"></div>
+      <hr> <!-- --------------------------------------------- -->
+      <div style="height: 10px;"></div>
+      <h4 style="color:orange;">DEV</h4>
+      <p id="api_complete_cmd_path" style="margin-top: 10px; margin-bottom: 10px;" class="debugging">paths</p>
+      <p id="api_complete_cmd_out" style="margin-top: 10px; margin-bottom: 10px;" class="debugging">out</p>
+    </div>
+
+  </div>
+
+  <div id="Basin_select" class="tabcontent">
+    <h3>River basin selection</h3>
+    <p style="max-width: 1250px;">
+      Use the map below to select one or multiple river basins to compute surface water concentrations for.
+      You can remove already selected basins by clicking on them for a second time or by clicking on their ID listed
+      below the map.
+    </p>
+
+    <h4>Instructions:</h4>
+    <ol style="max-width: 800px;">
+      <li>Select one or multiple basins, the selected basins list below the map shows which basins ePiE will be run for.
+      </li>
+      <li>Select the desired flow conditions from the drop down menu at the bottom of the screen.</li>
+    </ol>
+    <p>
+      The basin map can be reloaded when needed (for example when the map does not load properly).
+    </p>
+
+    <!-- <p>tabcontent.</p> -->
+    <div style="display: block;justify-content: left; width: 1345 px; max-width: 1365px; ">
+      <button id="reload_basin_map_btn" type="button" onclick="createBasinMapWrapper()">Reload basin map</button>
+      <div style="float:right;margin-top: 0px; margin-bottom: 0px;float: right;" id="hooveringBasinDiv">
+        <div id="basinhoveridbox">None</div>
+      </div>
+    </div>
+
+    <div id="osm_map"></div>
+    <div id="mapBasinholder">
+      <div id="mapBasin"></div>
+    </div>
+    <div style="margin-top: 5px; margin-bottom: 3px;" id="selected_basins_p">Selected basins:</div>
+    <ul id="selected_basins_list"></ul>
+    <div style="height: 1px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 5px;"></div>
+    <h4>Select flow conditions</h4>
+    <p style="max-width: 1250px;">ePiE has the option to make predictions for the longterm yearly average flow, minimum
+      and maximum flow conditions for the years 2000-2015.
+      The default option is average yearly flow. Use the drop-down menu below to change the flow conditions.</p>
+    <div id="prnt_slct_flow_div" style="display: flex; justify-content: left;">
+      <form style="margin-top: -5px;">
+        <label for="flow">Set flow condition: </label>
+        <select @change="getFlowSelection()" name="flow" id="flow">
+          <option value="Average">Average yearly flow</option>
+          <option value="Min">Minimum yearly flow</option>
+          <option value="Max">Maximum yearly flow</option>
+        </select>
+        <!-- <button type="button" style="margin-left: 10px;" class="action_button" onclick="getFlowSelection()">Confirm</button> -->
+      </form>
+      <p>Selected flow: </p>
+      <p id="prnt_slct_flow">Average</p>
+    </div>
+  </div>
+
+  <div id="Degradation" class="tabcontent">
+
+
+    <h4>WWTP removal</h4>
+    <!-- <p>Use SimpleTreat 4.0 to retreive estimates for primary and secondary removal fractions, alternatively the values calculated by SimpleTreat 4.0 can be overwritten in the table below.</p> -->
+    <p style="max-width: 1250px;">Within the ePiE model, locations and specifications of European wastewater treatment
+      plants (WWTPs) are based on the 'Urban Waste Water Treatment Database' (UWWTD).
+      Please note that therefore, small treatment plants (less then 2000 population equivalents) are not integrated into
+      ePiE.
+      To account for wastewater treatment within ePiE, removal fractions per API are required for each individual
+      treatment step within a WWTP.
+      Primary and secondary removal rates can be estimated via SimpleTreat 4.0 (based on compound properties) or entered
+      manually (e.g. based on experimental or literature data).
+      <!-- Removal fractions for advanced treatment steps can be entered manually (if applicable) but are not strictly required to compute results within ePiE. -->
+    </p>
+
+    <h4>Instructions:</h4>
+    <ul style="max-width: 800px;">
+      <li>Run SimpleTreat 4.0, possible when the tables on the previous tab are all filled.</li>
+      <li>Or, click "Edit table" and fill the removal fractions manually.</li>
+    </ul>
+    <p>
+      Removal fractions need to be between 0 and 1.
+    </p>
+
+    <button type="button" class="action_button" onclick="OpenCloseCollapsible('simpletreatinfo')">More
+      information</button>
+    <div id="simpletreatinfo" class="collapsible_content">
+      <p>The definitions of individual treatment steps used within ePiE are based on the EU Urban Waste Water Treatment
+        Directive and the in OECD glossary:</p>
+      <p><b>Primary treatment</b> refers to the “treatment of urban wastewater by a physical and/or chemical process
+        involving settlement of suspended solids, or other processes in which the BOD5 of the incoming waste water is
+        reduced by at least 20 % before discharge and the total suspended solids of the incoming waste water are reduced
+        by at least 50 %”.</p>
+      <p><b>Secondary treatment</b> is the second step in most waste treatment systems during which bacteria consume the
+        organic parts of the wastes. This is accomplished by bringing the sewage, bacteria and oxygen together in
+        trickling filters or within an activated sludge process. Secondary treatment removes all floating and settleable
+        solids and about 90 per cent of the oxygen—demanding substances and suspended solids. Disinfection by
+        chlorination is the final stage of the secondary treatment process. </p>
+      <!-- <p><b>Tertiary treatment</b> is the advanced treatment process, following secondary treatment of wastewater, that produces high—quality water. Tertiary treatment includes removal of nutrients such as phosphorus and nitrogen and practically all suspended and organic matter from wastewater.</p> -->
+      <!-- <p><b>Advanced treatment</b> technology (wastewater) refers to processes capable of reducing specific constituents in wastewater not normally achieved by other treatment options. It covers all unit operations that are not considered to be mechanical or biological, for example, chemical coagulation, flocculation and precipitation, break- point chlorination, stripping, mixed-media filtration, micro-screening, selective ion exchange, activated carbon absorption, reverse osmosis, ultrafiltration and electroflotation. Advanced treatment processes may be used in conjunction with mechanical and biological treatment operations.</p> -->
+      <p>Source: Glossary of Environment Statistics, Studies in Methods, Series F, No. 67, United Nations, New York,
+        1997</p>
+    </div>
+
+
+    <div style="height: 10px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 10px;"></div>
+    <h4>Table 3 - Removal due to primary and secondary treatment steps</h4>
+
+    <div style="margin-bottom: 1px;">
+      <button id="simpletreat40_btn" class="action_button" type="button" style="margin-bottom: 1rem;margin-top: 10px;"
+        onclick="runSimpleTreat4()">Run SimpleTreat 4.0</button>
+      <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
+      <button type="button" class="action_button" id="save3" onclick="saveTabValues()">Save table</button>
+      <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
+      <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
+    </div>
+
+
+    <form class="API_table_form" style="max-width: 800px;">
+      <table id="API_table_degradation" cellspacing="0" cellpadding="4">
+        <tbody>
+          <tr>
+            <th class="api2 tableHeader3"> <span class="firstSpan">API (ID)<span
+                  class="secondSpan">Explanation1</span></span> </th>
+            <th class="api2 tableHeader3"> <span class="firstSpan">Primary removal fraction<span
+                  class="secondSpan">Explanation1</span></span> </th>
+            <th class="api2 tableHeader3"> <span class="firstSpan">Secondary removal fraction<span
+                  class="secondSpan">Explanation2</span></span> </th>
+          </tr>
+          <tr>
+            <td><input style="width: 120px;" class="tableField3" type="text" id="API_ID_tab2_row1" value="Ibuprofen"
+                readonly /></td>
+            <td><input style="width: 280px;" class="tableField3" type="text" id="primaryFrac_row1" value="" readonly />
+            </td>
+            <td><input style="width: 280px;" class="tableField3" type="text" id="secondaryFrac_row1" value=""
+                readonly /></td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+
+
+    <div style="height: 10px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 10px;"></div>
+    <div style="display: none;">
+      <h4>Table 4 - Additional removal due to advanced treatment steps</h4>
+      <p>Advanced removal fractions need be set manually.</p>
+
+      <div style="margin-bottom: 1px;">
+        <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
+        <button type="button" class="action_button" id="save4" onclick="saveTabValues()">Save table</button>
+        <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
+        <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
+      </div>
+
+      <form class="API_table_form" style="max-width: 1200px;">
+        <table id="API_table_degradation2" cellspacing="0" cellpadding="4">
+          <tbody>
+            <tr>
+              <th class="api2 tableHeader4"> <span class="firstSpan">API (ID)<span
+                    class="secondSpan">Explanation1</span></span> </th>
+              <th class="api2 tableHeader4"> <span class="firstSpan">Removal fraction activated carbon<span
+                    class="secondSpan">Explanation3</span></span> </th>
+              <th class="api2 tableHeader4"> <span class="firstSpan">Removal fraction ozone<span
+                    class="secondSpan">Explanation4</span></span> </th>
+              <th class="api2 tableHeader4"> <span class="firstSpan">Removal fraction UV<span
+                    class="secondSpan">Explanation5</span></span> </th>
+            </tr>
+            <tr>
+              <td><input style="width: 120px;" class="tableField4" type="text" id="degr_col1" value="Ibuprofen"
+                  readonly /></td>
+              <td><input style="width: 280px;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
+              </td>
+              <td><input style="width: 280px;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
+              </td>
+              <td><input style="width: 280px;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
+  </div>
+
+  <div id="Consumption" class="tabcontent">
+    <h4>Consumption data</h4>
+    <!-- <p>The consumption data required to run ePiE is based on the selected river basin. Each rows below are dynamically created based on the WWTPs present in the selected river basin.</p> -->
+    <!-- <p>In this tab, country-specific consumption data needs to be entered for selected APIs. 
+    For which countries consumption data is required depends on the previously selected river basins. 
+    If a river basin is distributed over several countries, annual consumption data is required for each of these countries. 
+  </p> -->
+    <p style="max-width: 1250px;">
+      <!-- From the drop-down menu below, the prefered method of entering the consumption data can be selected. 
+    The first option uses an overall average per capita consumption value per API to compute the consumption for each country based on the population in a specific year.
+    The second and third option will require country-specific consumption data for each API (either the total consumption in kg/year or the per capita consumption g/year/capita). -->
+      By clicking the button 'Generate table', a table will be created below based on the selected river basins and
+      their respective countries.
+      The average per capita consumption values (g/capita/year) can be entered at the top, which will automatically
+      populate the country-specific total consumption values (kg/year)
+      based on the population in a specific year (default is 2024).
+      <!-- , can be changed after generating the table from the drop-down menu).  -->
+      <!-- If you have country-specific consumption data, you can simply overwrite the generated values in the table below (kg/year). -->
+    </p>
+
+    <h4>Instructions:</h4>
+    <ol style="max-width: 800px;">
+      <li>Click "Generate table" to create the table with required consumption data.</li>
+      <li>Fill the per capity yearly consumption (g/capita/year) in the first table (by clicking the "Edit table"
+        button).</li>
+      <li>Select the year for the country-specific populaton numbers.</li>
+      <li>(optionally) Overwrite the country-specific consumption values (in kg/year).</li>
+    </ol>
+
+    <!--
+  <form style="margin-top: -5px;">
+    <label for="cons_data_type">Select consumption data type: </label>
+    <select @change="selectConsDataType()" name="cons_data_type" id="cons_data_type" selected="select from drop-down menu">
+      <option value="euavg_percapitygram">Overall average per capita consumption (g/year)</option>
+      <option value="country_totalkgyear">Country-specific total yearly consumption (kg/year)</option>
+      <option value="country_percapitagram">Country-specific per capita consumption (g/year)</option>
+    </select>
+  </form>
+  -->
+    <div style="display: none;" id="cons_data_type_value_holder">euavg_percapitygram</div>
+
+    <div style="height: 15px;"></div>
+
+    <button id="gen_cons_table_btn" class="action_button" type="button" style="margin-bottom: 0rem;"
+      onclick="run_generateConsumptionTableWrapper()">Generate table</button>
+
+    <div id="cons_edit_buttons" style="display: none;">
+      <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
+      <button type="button" class="action_button" id="save5" onclick="saveTabValues()">Save table</button>
+      <!-- <button class="action_button" type="button" style="margin-bottom: 0rem;" onclick="notYetDeveloped()">Get Excel template</button> -->
+      <!-- <button class="action_button" type="button" style="margin-bottom: 0rem;" onclick="notYetDeveloped()">Read Excel data</button> -->
+    </div>
+
+    <form class="API_table_form" id="avg_per_capita_cons_table" style="max-width: 800px;">
+      <table id="API_table_consumption_avg_per_capita" cellspacing="0" cellpadding="4">
+        <tbody>
+        </tbody>
+      </table>
+    </form>
+
+    <div id="progress_gen_table_cons">Generating consumption table, please wait...</div>
+
+    <div id="div_container_pop_year">
+      <form style="margin-top: 0px;">
+        <label for="pop_year">Select population year</label>
+        <select @change="setPopulationYear()" name="pop_year" id="pop_year" selected="select from drop-down menu">
+          <option value=2024>2024</option>
+          <option value=2023>2023</option>
+          <option value=2022>2022</option>
+          <option value=2021>2021</option>
+          <option value=2020>2020</option>
+          <option value=2019>2019</option>
+          <option value=2018>2018</option>
+          <option value=2017>2017</option>
+          <option value=2016>2016</option>
+          <option value=2015>2015</option>
+          <option value=2014>2014</option>
+        </select>
+      </form>
+      <div style="display: none;" id="pop_year_value_holder">2024</div>
+    </div>
+
+    <form class="API_table_form" style="max-width: 800px;">
+      <table id="API_table_consumption" cellspacing="0" cellpadding="4">
+        <tbody>
+        </tbody>
+      </table>
+    </form>
+
+    <p id="consHeaderHoverInfo">Please hover over the table headers to get an explanation of each parameter as well as
+      the required unit.</p>
+
+  </div>
+
+
+  <div id="Run_process" class="tabcontent">
+    <h3>Run ePiE</h3>
+    <p style="max-width: 1250px;">After parameterisation the ePiE model can be run. Additionally, the current workspace
+      (all settings stored in the previous tabs) can be exported for future runs.</p>
+    <button class="action_button" type="button" style="margin-bottom: 0rem;" onclick="notYetDeveloped()">Store current
+      workspace</button>
+    <button class="action_button" type="button" style="margin-bottom: 2rem;" onclick="notYetDeveloped()">Load previous
+      workspace</button>
+    <div style="height: 0px;"></div>
+    <hr> <!-- --------------------------------------------- -->
+    <div style="height: 10px;"></div>
+    <button id="run_epie_btn" class="action_button" type="button" style="margin-bottom: 1rem;"
+      onclick="runEPIEWrapper()">Run ePiE</button>
+    <p id="cmd_path" class="debugging">paths</p>
+    <p id="cmd_out_title" style="margin-bottom: 0.1rem;">Progress:</p>
+    <div id="cmd_out"></div>
+    <div id="myProgress">
+      <div id="myBar"></div>
+    </div>
+  </div>
+
+  <div id="Map_results" class="tabcontent">
+    <h4>Map Results</h4>
+    <p style="max-width: 1150px;">
+      <!-- Here the estimated river concentrations can visualized spatially on a map. Please select the API for which you want to generate the map from the drop-down menu and click the button 'Generate map'. -->
+      Here the estimated river concentrations can visualized spatially on a map, click the button 'Generate map' to
+      visualize the results.
+      Additionally, the spatial data can be exported as GeoJSON file and the full output data (including non-spatial
+      data) can be exported as Excel file.
+    </p>
+    <label style="margin-right: 4px;" for="API_map_selection">Select API to create map for: </label>
+    <select name="API_map_selection" id="API_map_selection">
+      <option value="API1">No results yet</option>
+      <!-- <option value="API1">Ibuprofen3</option>
+    <option value="API1">Ibuprofen4</option> -->
+    </select>
+    <!-- <p>tabcontent.</p> -->
+    <button class="action_button" style="margin-left: 10px;" type="button" onclick="createOutputMapWrapper()">Generate
+      map</button>
+    <div id="osm_map"></div>
+    <div id="mapholder">
+      <div id="map"></div>
+    </div>
+    <button class="action_button" style="margin-left: 10px;" type="button"
+      onclick="exportSpatialGEOJSONWrapper()">Export spatial data</button>
+    <button class="action_button" id="ExcelExportBtnConc" style="margin-left: 10px;" type="button"
+      onclick="exportFullOutputExcelWrapper()">Export full data as Excel</button>
+  </div>
+
+  <div id="PNEC_Map_results" class="tabcontent">
+    <h4>Map Risks</h4>
+    <p style="max-width: 1250px;">
+      Here the risks are mapped spatially by comparing the estimated river concentrations against a risk threshold.
+      Please set the risk threshold you want to compare the concentrations against
+      and click the button 'Generate map'.
+    </p>
+    <label style="margin-right: 4px;" for="API_map_selection">Select API to create map for: </label>
+    <select name="API_map_selection" id="API_map_selection">
+      <option value="API1">No results yet</option>
+      <!-- <option value="API1">Ibuprofen3</option>
+    <option value="API1">Ibuprofen4</option> -->
+    </select>
+    <!-- <p>tabcontent.</p> -->
+    <label style="width: 10px;"> </label>
+    <label style="margin-right: 4px;" for="API_map_selection">Risk threshold value: </label>
+    <input style="width: 150px;" class="riskvalclass" type="text" id="riskval" value="0.01" />
+    <label style="margin-right: 4px;" for="API_map_selection">ug/L </label>
+    <button class="action_button" style="margin-left: 10px;" type="button"
+      onclick="createPNECOutputMapWrapper()">Generate map</button>
+    <div id="osm_map"></div>
+    <div id="pnec_mapholder">
+      <div id="pnec_map"></div>
+    </div>
+    <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="exportSpatialGEOJSONWrapper()">Export spatial data</button>
+  <button class="action_button" style="margin-left: 10px;" type="button" onclick="exportFullOutputExcelWrapper()">Export full data as Excel</button> -->
+  </div>
+
+
+  <div id="Basin_result_stats" class="tabcontent">
+    <h4>Output Statistics</h4>
+    <p>
+      Here the estimated river concentrations can summerized. Click the button 'Calculate statistics' to populate the
+      table.
+    </p>
+    <label style="margin-right: 4px;" for="API_map_selection">Calculate statistics for: </label>
+    <select name="API_map_selection" id="API_map_selection">
+      <option value="API1">No results yet</option>
+      <!-- <option value="API1">Ibuprofen3</option>
+    <option value="API1">Ibuprofen4</option> -->
+    </select>
+    <!-- <p>tabcontent.</p> -->
+    <button class="action_button" style="margin-left: 10px;" type="button"
+      onclick="CalculateBasinStatisticsWrapper()">Calculate statistics</button>
+
+    <div>
+      <form class="API_table_form" style="max-width: 1150px;">
+        <table id="API_table_basinStats" cellspacing="0" cellpadding="4">
+          <tbody>
+            <tr>
+              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span
+                  class="firstSpan">API<br>(ID)<br><span class="secondSpan">Explanation1</span></span> </th>
+              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span
+                  class="firstSpan">Basin<br>(ID)<br><span class="secondSpan">Explanation1</span></span> </th>
+              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Mean
+                  ug/L<br>(all)<br><span class="secondSpan">Explanation3</span></span> </th>
+              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Median
+                  ug/L<br>(all)<br><span class="secondSpan">Explanation4</span></span> </th>
+              <th style="width: 200px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Mean
+                  ug/L<br>(downstream WWTP)<br><span class="secondSpan">Explanation5</span></span> </th>
+              <th style="width: 200px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Median
+                  ug/L<br>(downstream WWTP)<br><span class="secondSpan">Explanation6</span></span> </th>
+            </tr>
+            <tr>
+              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
+              </td>
+              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
+              </td>
+              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
+              </td>
+              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
+              </td>
+              <td><input style="width: 200px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
+              </td>
+              <td><input style="width: 200px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
+    <div style="height: 45px;"></div>
+    <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="xxx()">Export statistics</button> -->
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+
+  <script>openWelcomeTab("Welcome_screen", 0); // load the welcome tab</script>
+
+</body>
+</html>
