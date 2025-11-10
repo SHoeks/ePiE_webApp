@@ -7,7 +7,12 @@
     <link rel="icon" href="favicon.ico">
 
     <title>ePiE</title>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- libraries -->
+    <script src="lib/leaflet.js"></script>
+    <script src="lib/xlsx.full.min.js"></script>
+    <script src="lib/math.js"></script>
+    <!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> -->
     <!-- <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> -->
 
     <!-- stylesheets -->
@@ -32,7 +37,7 @@
       lockedTabs['Welcome_screen'] = false;
 
       // chem properties table data
-      var chem_data = [];
+      var APIExcelTemplateFullPath = "./data/model_inputs/API_template.xlsx";
 
     </script>
 
@@ -41,14 +46,22 @@
     <script src="assets/_copyOverAPI_ID.js"></script>
     <script src="assets/_copyOverAPI_ID.js"></script>
     <script src="assets/_saveTabValues.js"></script>
+    <script src="assets/_editTabValues.js"></script>
+    <script src="assets/_openCloseCollapsible.js"></script>
+    <script src="assets/_getFlowSelection.js"></script>
 
     <!-- epie functions -->
-    <script src="epie/_createBasinMap.js"></script>
-    <script src="epie/_CompleteChemProperties.js"></script> 
+    <script src="assets/_createBasinMap.js"></script>
+    <script src="assets/_CompleteChemProperties.js"></script> 
+    <script src="assets/_getExcelAPIDataTemplate.js"></script>
+    <script src="assets/_loadExcelData.js"></script>
+    <script src="assets/_getSetChemProperties.js"></script>
+    <script src="assets/_SimpleTreat4_0.js"></script>
 
     <!-- local epie data -->
     <script src="data/basin_geo/Basin.js"></script>
-     
+    <script src="data/model_inputs/example_chem.js"></script>
+
 
   </head>
 <body>
@@ -73,6 +86,7 @@
       onclick="openTabWrapper(event, 'Basin_result_stats')">Output Statistics</button>
     <button id="tablink_PNEC_Map_results" class="tablinks" onclick="openTabWrapper(event, 'PNEC_Map_results')">Map
       Risks</button>
+    <button id="tablink_full_settings" class="tablinks" onclick="openTabWrapper(event, 'full_settings')">View Settings</button>
   </div>
 
   <div class="tabbuffer"></div>
@@ -185,7 +199,11 @@
     <!-- <p style="margin-top: 10px; margin-bottom: 0px;">Initial API properties</p> -->
     <div style="margin-bottom: 1px;">
       <button type="button" class="action_button" onclick="getExcelAPIDataTemplateWrapper()">Get Excel template</button>
-      <button type="button" class="action_button" onclick="loadExcelData()">Read Excel data</button>
+      <button type="button" class="action_button" id="uploadChemExcel" onclick="loadExcelData()">Read Excel data</button>
+      <div id="selectorContainer" style="display:none;">
+        <p>Select API in uploaded Excel file:</p>
+        <select id="rowExcelSelector"></select>
+      </div>
     </div>
 
     <div style="height: 5px;"></div>
@@ -239,28 +257,23 @@
                   </p></span>
               </span> </th>
             <th class="api tableHeader"> <span class="firstSpan">k_bio_wwtp<br>
-                <p>(-)</p><span class="secondSpan">First order biodegradation rate constant for secondary treatment <p
-                    class="hover_unit">-</p></span>
+                <p>(unit)</p><span class="secondSpan">First order biodegradation rate constant for secondary treatment <p
+                    class="hover_unit">unit</p></span>
               </span> </th>
             <!-- <th class="api tableHeader">metab</th>
           <th class="api tableHeader">API_metab</th> -->
           </tr>
           <tr>
-            <td><input style="width: 120px;" class="tableField" type="text" id="name_row1" value="Ibuprofen" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="cas_row1" value="15687-27-1" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="class_row1" value="acid" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="MW_row1" value="206.2808" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="KOW_n_row1" value="9332.543" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="Pv_row1" value="0.0248" readonly /></td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="S_row1" value="21" readonly /></td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="pKa_row1" value="4.85" readonly /></td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="f_u_row1" value="0.2" readonly /></td>
-            <td><input style="width: 120px;" class="tableField" type="text" id="f_f_row1" value="0.0" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="name_row1" value="Ibuprofen" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="cas_row1" value="15687-27-1" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="class_row1" value="acid" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="MW_row1" value="206.2808" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="KOW_n_row1" value="9332.543" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="Pv_row1" value="0.0248" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="S_row1" value="21" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="pKa_row1" value="4.85" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="f_uf_row1" value="0.2" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField" type="text" id="k_bio_wwtp_row1" value="0.0" readonly /></td>
             <!-- <td><input style="width: 100px;" class="tableField" type="text" id="metab_1" value="0" readonly /></td>
         <td><input style="width: 100px;" class="tableField" type="text" id="API_metab_1" value="" readonly /></td> -->
           </tr>
@@ -325,13 +338,12 @@
           </tr>
           <tr>
 
-            <td><input style="width: 120px;" class="tableField2" type="text" id="API_ID_tab2_row1" value="" readonly />
-            </td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2" type="text" id="API_ID_tab2_row1" value="" readonly /></td>
             <!--<td><input style="width: 120px;" class="tableField2" type="text" id="KOW_n_row1" value="" readonly /></td>-->
-            <td><input style="width: 120px;" class="tableField2" type="text" id="Kp_ps_n_row1" value="" readonly /></td>
-            <td><input style="width: 120px;" class="tableField2" type="text" id="Kp_as_n_row1" value="" readonly /></td>
-            <td><input style="width: 120px;" class="tableField2" type="text" id="Kp_sd_n_row1" value="" readonly /></td>
-            <td><input style="width: 120px;" class="tableField2" type="text" id="KOC_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2" type="text" id="Kp_ps_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2" type="text" id="Kp_as_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2" type="text" id="Kp_sd_n_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2" type="text" id="KOC_n_row1" value="" readonly /></td>
             <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="k_bio_wwtp_n_row1" value="" readonly /></td> -->
             <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="k_bio_sw1_n_row1" value="" readonly /></td> -->
             <!-- <td><input style="width: 120px;" class="tableField2" type="text" id="T_bio_sw_n_row1" value="" readonly /></td> -->
@@ -391,18 +403,12 @@
           </tr>
           <tr>
 
-            <td><input style="width: 120px;" class="tableField2alt" type="text" id="API_ID_tab2alt_row1" value=""
-                readonly /></td>
-            <td><input style="width: 120px;" class="tableField2alt" type="text" id="KOW_alt_row1" value="" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField2alt" type="text" id="Kp_ps_alt_row1" value="" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField2alt" type="text" id="Kp_as_alt_row1" value="" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField2alt" type="text" id="Kp_sd_alt_row1" value="" readonly />
-            </td>
-            <td><input style="width: 120px;" class="tableField2alt" type="text" id="KOC_alt_row1" value="" readonly />
-            </td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2alt" type="text" id="API_ID_tab2alt_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2alt" type="text" id="KOW_alt_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2alt" type="text" id="Kp_ps_alt_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2alt" type="text" id="Kp_as_alt_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2alt" type="text" id="Kp_sd_alt_row1" value="" readonly /></td>
+            <td><input style="width: 120px;text-align: center;" class="tableField2alt" type="text" id="KOC_alt_row1" value="" readonly /></td>
             <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="k_bio_wwtp_alt_row1" value="" readonly /></td> -->
             <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="k_bio_sw1_alt_row1" value="" readonly /></td> -->
             <!-- <td><input style="width: 120px;" class="tableField2alt" type="text" id="T_bio_sw_alt_row1" value="" readonly /></td> -->
@@ -481,7 +487,7 @@
     <div id="prnt_slct_flow_div" style="display: flex; justify-content: left;">
       <form style="margin-top: -5px;">
         <label for="flow">Set flow condition: </label>
-        <select @change="getFlowSelection()" name="flow" id="flow">
+        <select onchange="getFlowSelection()" name="flow" id="flow">
           <option value="Average">Average yearly flow</option>
           <option value="Min">Minimum yearly flow</option>
           <option value="Max">Maximum yearly flow</option>
@@ -566,11 +572,11 @@
                   class="secondSpan">Explanation2</span></span> </th>
           </tr>
           <tr>
-            <td><input style="width: 120px;" class="tableField3" type="text" id="API_ID_tab2_row1" value="Ibuprofen"
+            <td><input style="width: 120px;text-align: center;" class="tableField3" type="text" id="API_ID_tab2_row1" value="Ibuprofen"
                 readonly /></td>
-            <td><input style="width: 280px;" class="tableField3" type="text" id="primaryFrac_row1" value="" readonly />
+            <td><input style="width: 280px;text-align: center;" class="tableField3" type="text" id="primaryFrac_row1" value="" readonly />
             </td>
-            <td><input style="width: 280px;" class="tableField3" type="text" id="secondaryFrac_row1" value=""
+            <td><input style="width: 280px;text-align: center;" class="tableField3" type="text" id="secondaryFrac_row1" value=""
                 readonly /></td>
           </tr>
         </tbody>
@@ -606,13 +612,13 @@
                     class="secondSpan">Explanation5</span></span> </th>
             </tr>
             <tr>
-              <td><input style="width: 120px;" class="tableField4" type="text" id="degr_col1" value="Ibuprofen"
+              <td><input style="width: 120px;text-align: center;" class="tableField4" type="text" id="degr_col1" value="Ibuprofen"
                   readonly /></td>
-              <td><input style="width: 280px;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
+              <td><input style="width: 280px;text-align: center;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
               </td>
-              <td><input style="width: 280px;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
+              <td><input style="width: 280px;text-align: center;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
               </td>
-              <td><input style="width: 280px;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
+              <td><input style="width: 280px;text-align: center;" class="tableField4" type="text" id="degr_col1" value="0.0" readonly />
               </td>
             </tr>
           </tbody>
@@ -852,16 +858,34 @@
     <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="xxx()">Export statistics</button> -->
   </div>
 
-
-
-
-
-
-
+  <div id="full_settings" class="tabcontent">
+    <!-- <div style="height: 25px;"></div> -->
+    <h4>Full ePiE settings</h4>
+    <p>API properties:</p>
+    <pre id="chemDataFull">{Undefined}</pre>
+    <p>WWTP removal:</p>
+    <pre id="wwtpRemovalDataFull">{Undefined}</pre>
+    <p>Selected basins:</p>
+    <pre id="selectedBasinsDataFull">{Undefined}</pre>
+    <p>Selected flow:</p>
+    <pre id="selectedFlowDataFull">{Undefined}</pre>
+    <p>Consumption data:</p>
+    <pre id="consumptionDataFull">{Undefined}</pre>
   </div>
 
+  <!-- init app -->
+  <script>
 
-  <script>openWelcomeTab("Welcome_screen", 0); // load the welcome tab</script>
+    // load welcome tab on startup
+    openWelcomeTab("Welcome_screen", 0); // load the welcome tab
+
+    // set values example API chem data
+    setChemProperties(example_chem);
+
+    // set default flow conditions 
+    getFlowSelection();
+
+  </script>
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-export default function editTabValues() {
+function editTabValues() {
     
   var fields = document.querySelectorAll("table input[type='text']");
   for (var i = 0; i < fields.length; i++) {

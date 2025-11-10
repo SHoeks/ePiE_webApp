@@ -1,5 +1,5 @@
-var math = require('mathjs');
-var fs = require('fs');
+// var math = require('mathjs');
+// var fs = require('fs');
 // testing code
 /*
 let chemIdx = 0;
@@ -8,37 +8,103 @@ let out = SimpleTreat4_0(filepath,chemIdx)
 console.log(out);
 */
 
-/* eslint-disable */
-export default function SimpleTreat4_0(filepath,chemIdx) {
-
-  console.log(`filepath: ${filepath}`);
-  console.log(`chem_idx: ${chemIdx}`);
+function runSimpleTreat4(){
   
-  // Simple CSV loader assuming semicolon delimiter and header
-  function loadCSV(file) {
-      const data = fs.readFileSync(file, 'utf-8');
-      const [headerLine, ...lines] = data.trim().split('\n');
-      const headers = headerLine.split(';');
-    
-      return lines.map(line => {
-        const parts = line.split(';');
-        return headers.reduce((obj, h, i) => {
-          const raw = parts[i];
-          if (raw === 'NA' || raw === '') {
-            obj[h] = null;
-          } else {
-            const num = parseFloat(raw);
-            obj[h] = isNaN(num) ? raw : num;
-          }
-          return obj;
-        }, {});
-      });
+  console.log("runSimpleTreat4");
+  
+  // check if the api table is empty
+  let check = false;
+  let tf1 = document.querySelector("#API_properties").getElementsByClassName("tableField");
+  let tf2 = document.querySelector("#API_properties").getElementsByClassName("tableField2");
+  let tf3 = document.querySelector("#API_properties").getElementsByClassName("tableField2alt");
+  for (let index = 0; index < tf1.length; index++) {
+    if(tf1[index].value === "") check = true;
+  }
+  for (let index = 0; index < tf2.length; index++) {
+    if(tf2[index].value === "") check = true;
+  }
+  for (let index = 0; index < tf3.length; index++) {
+    if(tf3[index].value === "") check = true;
+  }
+  console.log("API table NA check: ",check);
+  
+  // quit function if check is true
+  if(check){
+    // dialog.showMessageBox({
+    //   title: "API properties incomplete",
+    //   message: 'Please complete the API properties in Table 2 before running SimpleTreat4.0',
+    //   buttons: ['OK']
+    // })
+    alert("Please complete the API properties in Table 1 and Table 2 before running SimpleTreat4.0");
+    return;
   }
   
-  // === Load chemical data ===
-  let chem = loadCSV(filepath);
+  // gather inputs for SimpleTreat4.0 (write chem data as csv)
+  // let tmp_csv_fullpath = tableToCSV(fullTempPathDir,"API_run.csv");
+  // console.log("API in:",tmp_csv_fullpath);
+
+  // gather updated chem data
+  var chem_data = getChemProperties();
+  console.log("Chem data for SimpleTreat4.0:",chem_data);
+  
+  // single chem parsed
+  if(chem_data.length == undefined && chem_data.constructor == Object){
+    chem_data = [chem_data];
+  }
+  
+  // run SimpleTreat4.0 (js)
+  let out = SimpleTreat4_0(chem_data,0);
+  console.log("SimpleTreat4_0 js out:",out);
+  
+  // fill in primary and secondary removal fractions table
+  let remPrimFloat = out.remPrim;
+  let remSecFloat = out.remSec;
+  let pf = remPrimFloat; //0.031;
+  let sf = remSecFloat; //0.813;
+  pf = Math.round(pf*100000)/100000.00;
+  sf = Math.round(sf*100000)/100000.00;
+  let div1 = document.getElementById("primaryFrac_row1");
+  let div2 = document.getElementById("secondaryFrac_row1");
+  div1.value = pf;
+  div2.value = sf;
+  div1.setAttribute('value',pf); 
+  div2.setAttribute('value',sf); 
+  div1.style.color = "#ff9000";
+  div2.style.color = "#ff9000";
+
+}
+
+/* eslint-disable */
+function SimpleTreat4_0(chem,chemIdx) {
+
+  // console.log(`filepath: ${filepath}`);
+  // console.log(`chem_idx: ${chemIdx}`);
+  
+  // // Simple CSV loader assuming semicolon delimiter and header
+  // function loadCSV(file) {
+  //     const data = fs.readFileSync(file, 'utf-8');
+  //     const [headerLine, ...lines] = data.trim().split('\n');
+  //     const headers = headerLine.split(';');
+    
+  //     return lines.map(line => {
+  //       const parts = line.split(';');
+  //       return headers.reduce((obj, h, i) => {
+  //         const raw = parts[i];
+  //         if (raw === 'NA' || raw === '') {
+  //           obj[h] = null;
+  //         } else {
+  //           const num = parseFloat(raw);
+  //           obj[h] = isNaN(num) ? raw : num;
+  //         }
+  //         return obj;
+  //       }, {});
+  //     });
+  // }
+  
+  // // === Load chemical data ===
+  // let chem = loadCSV(filepath);
   let entry = chem[chemIdx];
-  console.log(entry);
+  console.log("ST4 chem entry:",entry);
   
   // === Extract chemical properties ===
   let chemClass = entry.class;
