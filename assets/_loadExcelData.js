@@ -1,7 +1,6 @@
 function loadExcelData(){
 
   const uploadBtn = document.getElementById('uploadChemExcel');
-  const output = document.getElementById('chemDataFull');
   const rowSelector = document.getElementById('rowExcelSelector');
 
   // Create a hidden file input
@@ -88,7 +87,7 @@ function loadExcelData(){
   rowSelector.addEventListener('change', () => {
     const index = rowSelector.value;
     if (index === "") {
-      output.textContent = "";
+      clearChemProperties();
       return;
     }
 

@@ -72,6 +72,11 @@ function runSimpleTreat4(){
   div1.style.color = "#ff9000";
   div2.style.color = "#ff9000";
 
+  chem_data[0].custom_wwtp_primary_removal = pf;
+  chem_data[0].custom_wwtp_secondary_removal = sf;
+
+  setChemProperties(chem_data[0], true, true);
+
 }
 
 /* eslint-disable */

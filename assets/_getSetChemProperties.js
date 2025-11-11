@@ -1,7 +1,18 @@
+clearChemProperties = function() {
+
+    const output = document.getElementById('chemDataFull');
+    const outputwwtp = document.getElementById('wwtpRemovalDataFull');
+    output.textContent = "{Undefined}";
+    outputwwtp.textContent = "{Undefined}";
+    console.log("Chemical data cleared in clearChemProperties");
+
+}
+
 
 getChemProperties = function() {
 
     const output = document.getElementById('chemDataFull');
+    const outputwwtp = document.getElementById('wwtpRemovalDataFull');
     
     // no data check
     if(output.textContent == "{Undefined}"){
@@ -11,31 +22,74 @@ getChemProperties = function() {
 
     // parse chem data
     let chemDat = JSON.parse(output.textContent);
+
+    // no wwtp data check
+    if(outputwwtp.textContent != "{Undefined}"){
+        console.log("WWTP removal data available in getChemProperties");
+        let chemDatWWTP = JSON.parse(outputwwtp.textContent);
+        // merge both objects
+        chemDat = {...chemDat, ...chemDatWWTP};
+    }
+
+    // return chem data
     console.log("Chemical data retrieved in getChemProperties: ", chemDat);
     return chemDat;
 
 }
 
+splitChemWWTPdata = function(chem) {
+    let keys = Object.keys(chem);
+    let substring = "custom_wwtp_";
+    let containskeys = keys.some(str => str.includes(substring))
+    let chemDatWWTP = {};
+    if(containskeys){
+        console.log("WWTP removal data detected in setChemProperties");
+        for (let key of keys) {
+            if (key.includes(substring)) {
+                chemDatWWTP[key] = chem[key];
+                delete chem[key];
+            }
+        }
+    }
+    return [chem, chemDatWWTP];
+}
+
 setChemProperties = function(chem, overwriteChemTables = true, colorWarning = false) {
 
     const output = document.getElementById('chemDataFull');
+    const outputwwtp = document.getElementById('wwtpRemovalDataFull');
     
     // no data check
     if(chem == undefined){
         console.log("No chemical data provided to setChemProperties");
         output.textContent = "{Undefined}";
+        outputwwtp.textContent = "{Undefined}";
         return;
     }
 
     // single chem parsed
     if(chem.length == undefined && chem.constructor == Object){
         console.log("Single chemical data provided to setChemProperties");
+        let chemDatWWTP = {};
+        [chem, chemDatWWTP] = splitChemWWTPdata(chem);
+        if(Object.keys(chemDatWWTP).length > 0){
+            outputwwtp.textContent = JSON.stringify(chemDatWWTP, null, 2);
+        } else {
+            outputwwtp.textContent = "{Undefined}";
+        }
         output.textContent = JSON.stringify(chem, null, 2);
     }
 
     // mulitple parsed select first
     if(chem.length != undefined && chem.constructor == Array){
         console.log("Multiple chemical data provided to setChemProperties, selecting first");
+        let chemDatWWTP = {};
+        [chem[0], chemDatWWTP] = splitChemWWTPdata(chem[0]);
+        if(Object.keys(chemDatWWTP).length > 0){
+            outputwwtp.textContent = JSON.stringify(chemDatWWTP, null, 2);
+        } else {
+            outputwwtp.textContent = "{Undefined}";
+        }
         output.textContent = JSON.stringify(chem[0], null, 2);
     }
 
@@ -82,7 +136,13 @@ updateChemTables = function(overwriteChemTables = true, colorWarning = false) {
     console.log("Filling table using hidden chem data (", updateChemTables, ")");
 
     const datObj = document.getElementById('chemDataFull');
-    const chemDat = JSON.parse(datObj.textContent);
+    var chemDat = JSON.parse(datObj.textContent);
+    const datObjWWTP = document.getElementById('wwtpRemovalDataFull');
+    if(datObjWWTP.textContent != "{Undefined}"){
+        console.log("WWTP removal data available in getChemProperties");
+        let chemDatWWTP = JSON.parse(datObjWWTP.textContent);
+        chemDat = {...chemDat, ...chemDatWWTP};
+    }
     console.log(chemDat);
     const dataHeader = Object.keys(chemDat);
     console.log(dataHeader);

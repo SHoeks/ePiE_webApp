@@ -94,6 +94,7 @@ function createBasinMap(selected_basins,selected_basins_names){
               }       
               console.log('Selected_basins: ' + selected_basins);
               console.log('selected_basins_names: ' + selected_basins_names);
+              setBasinSelectSettings(selected_basins,selected_basins_names);
               // let selected_basins_str = selected_basins.join(', ');
               // document.getElementById('selected_basins_p').innerText = 'Selected basins IDs ' + selected_basins_str;
               let list = document.getElementById('selected_basins_list');
@@ -132,6 +133,8 @@ function createBasinMap(selected_basins,selected_basins_names){
                   console.log('Selected_basins: ' + selected_basins);
                   console.log('selected_basins_names: ' + selected_basins_names);
                   selected_basins
+                  setBasinSelectSettings(selected_basins,selected_basins_names);
+   
                 };
                 list.appendChild(node);
               });
@@ -146,4 +149,15 @@ function createBasinMap(selected_basins,selected_basins_names){
 
     geoJson.addTo(map);
           
-  }
+}
+
+function setBasinSelectSettings(selected_basins,selected_basins_names){
+
+  var htmlbasinselectdata = document.getElementById('selectedBasinsDataFull'); 
+  var basin_js_obj = {selected_basins: selected_basins, selected_basins_names: selected_basins_names};
+  htmlbasinselectdata.textContent = JSON.stringify(basin_js_obj, null, 2);
+
+}
+
+
+

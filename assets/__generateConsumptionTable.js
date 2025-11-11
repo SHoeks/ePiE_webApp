@@ -1,8 +1,51 @@
-import fs from 'fs'
-import { parse } from 'csv-parse/sync';
-const pathModule = require('path');
+// import fs from 'fs'
+// import { parse } from 'csv-parse/sync';
+// const pathModule = require('path');
 
-export default function generateConsumptionTable(resourceDir, tempDir, selected_basins) {
+function run_generateConsumptionTableInner(){
+
+    document.querySelector("#progress_gen_table_cons").style.display = "inline-block";
+    
+    if(selected_basins.length == 0){
+        console.log("No basins selected");
+        // dialog.showMessageBox({
+        //     title: "No basins selected",
+        //     message: 'No basins selected, please select at least one basin to generate the consumption data table',
+        //     buttons: ['OK']
+        // })
+        alert("No basins selected, please select at least one basin to generate the consumption data table");
+        document.querySelector("#progress_gen_table_cons").style.display = "none";
+        return;
+    }
+
+    let out = generateConsumptionTable(fullBasinResourceDir, fullTempPathDir, selected_basins);
+    console.log(out);
+    
+    let test = populationPerCapConversion("NL",2024);
+    console.log("test: ",test);
+    let countries = getCountriesConsPop();
+    console.log(countries);
+
+    // show loading info
+    if(out==1) document.querySelector("#cons_edit_buttons").style.display = "inline-block";
+    document.querySelector("#progress_gen_table_cons").style.display = "none";
+
+}
+
+function run_generateConsumptionTableWrapper(){
+
+    console.log("run_generateConsumptionTableWrapper");
+
+    // check if current cons table is empty or not 
+    let tableempty = document.querySelector("#API_table_consumption").innerHTML === "<tbody></tbody>"
+    if(!tableempty) console.log("Table not empty");
+    run_generateConsumptionTableInner();
+    copyOverAPI_ID();
+
+
+}
+
+function generateConsumptionTable(resourceDir, tempDir, selected_basins) {
 
     console.log("Generating Consumption Table JS");
     console.log(resourceDir);
