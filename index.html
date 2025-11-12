@@ -38,7 +38,7 @@
       var APIExcelTemplateFullPath = "./data/model_inputs/API_template.xlsx";
 
       // base path of hydrological data (end with "/"!)
-      var baseHydroDataPath = "./data/resources/basins_js/";
+      var baseHydroDataPath = "../data/resources/basins_js/";
 
       // global vars holding big pts, hl and flow data
       var global_pts_data = null;
@@ -55,6 +55,7 @@
     <script src="assets/editTabValues.js"></script>
     <script src="assets/openCloseCollapsible.js"></script>
     <script src="assets/getFlowSelection.js"></script>
+    <script src="assets/populationPerCapConversion.js"></script>
 
     <!-- epie functions -->
     <script src="assets/createBasinMap.js"></script>
@@ -63,8 +64,9 @@
     <script src="assets/loadExcelData.js"></script>
     <script src="assets/getSetChemProperties.js"></script>
     <script src="assets/SimpleTreat4_0.js"></script>
-    <script src="assets/xxxAccessBasinDB.js"></script>
-    <!-- <script src="assets/xxxgenerateConsumptionTable.js"></script> -->
+    <script src="assets/AccessBasinDB.js"></script>
+    <script src="assets/generateConsumptionTable.js"></script>
+    <script src="assets/getCountriesConsPop.js"></script>
 
     <!-- local epie data -->
     <script src="data/basin_geo/Basin.js"></script>
@@ -681,7 +683,8 @@
     <div style="height: 15px;"></div>
 
     <button id="gen_cons_table_btn" class="action_button" type="button" style="margin-bottom: 0rem;"
-      onclick="run_generateConsumptionTableWrapper()">Generate table</button>
+      onclick="generateConsumptionTableWrapper()"
+      >Generate table</button>
 
     <div id="cons_edit_buttons" style="display: none;">
       <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
@@ -702,7 +705,7 @@
     <div id="div_container_pop_year">
       <form style="margin-top: 0px;">
         <label for="pop_year">Select population year</label>
-        <select @change="setPopulationYear()" name="pop_year" id="pop_year" selected="select from drop-down menu">
+        <select onchange="setPopulationYear()" name="pop_year" id="pop_year" selected="select from drop-down menu">
           <option value=2024>2024</option>
           <option value=2023>2023</option>
           <option value=2022>2022</option>
@@ -886,7 +889,7 @@
     <!-- buttons for testing functions -->
     <div style="height: 10px;"></div>
     <button class="action_button" style="margin-left: 10px;" type="button" onclick="loadBigData()">loadBigData</button>
-    <button class="action_button" style="margin-left: 10px;" type="button" onclick="AccessBasinDB()">AccessBasinDB</button>
+    <button class="action_button" style="margin-left: 10px;" type="button" onclick="ExampleAccessBasinData()">ExampleAccessBasinData</button>
     <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="fileConstructor()">fileConstructor</button> -->
     <div style="height: 10px;"></div>
   </div>

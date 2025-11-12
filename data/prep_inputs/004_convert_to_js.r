@@ -1,6 +1,6 @@
-library(ePiE)
-library(zip)
-library(mapview)
+#library(ePiE)
+#library(zip)
+#library(mapview)
 library(sf)
 library(terra)
 library(fst)
@@ -87,7 +87,7 @@ for (i in 1:nrow(csvf)) {
   }
   str(dlist)
   djs = toJSON(dlist, pretty = FALSE, auto_unbox = TRUE, digits = 3)
-  varname = strsplit(basename(csvf$f[i]), "\\.")[[1]][1]
+  varname = "data" #strsplit(basename(csvf$f[i]), "\\.")[[1]][1]
   djs2 = paste0("export const ", varname, " = ","\n",djs,"\n",";")
   outfn = paste0("basins_js/", tools::file_path_sans_ext(basename(csvf$f[i])), ".js")
   write(djs2, file = outfn)

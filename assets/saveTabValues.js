@@ -210,11 +210,28 @@ function saveTabValues() {
         let cons = (percapitakg * pop).toFixed(3);
         console.log(cons);
         //if(document.querySelector(selector).value===""){
-        document.querySelector(selector).value = cons;
+        console.log(document.querySelector(selector).style.opacity==0.99);
+        if(document.querySelector(selector).style.opacity!=0.99){
+          document.querySelector(selector).value = cons;
+        }
+        if(document.querySelector(selector).value==="" || isNaN(parseFloat(document.querySelector(selector).value))){
+          document.querySelector(selector).value = cons;
+          document.querySelector(selector).style.opacity = 1.00;
+        }
         //}
       }
 
     }
   }
 
+  // save consumption numbers to global settings tab
+  setConsumptionToSettings();
+
 }
+
+function setTableValues(obj){
+  obj.value = obj.value;
+  obj.setAttribute('value',obj.value); 
+  obj.style.opacity = 0.99;
+}
+
