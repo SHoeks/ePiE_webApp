@@ -870,6 +870,10 @@
     <pre id="selectedFlowDataFull">{Undefined}</pre>
     <p>Consumption data:</p>
     <pre id="consumptionDataFull">{Undefined}</pre>
+
+    <div style="height: 10px;"></div>
+    <button class="action_button" style="margin-left: 10px;" type="button" onclick="loadBigData()">Export spatial data</button>
+    <div style="height: 10px;"></div>
   </div>
 
   <!-- init app -->
@@ -883,6 +887,14 @@
 
     // set default flow conditions 
     getFlowSelection();
+
+    // test for loading basin data later on request
+    function loadBigData() {
+      import('./bigData.js').then(({ bigData }) => {
+        console.log('Loaded big data:', bigData);
+      });
+    }
+
 
   </script>
 
