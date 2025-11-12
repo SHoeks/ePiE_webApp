@@ -37,9 +37,17 @@
       // chem properties table data
       var APIExcelTemplateFullPath = "./data/model_inputs/API_template.xlsx";
 
+      // base path of hydrological data (end with "/"!)
+      var baseHydroDataPath = "./data/resources/basins_js/";
+
+      // global vars holding big pts, hl and flow data
+      var global_pts_data = null;
+      var global_hl_data = null;
+      var global_flow_data = null;
+
     </script>
 
-    <!-- interface helper functions -->
+    <!-- functions -->
     <script src="assets/openTab.js"></script>
     <script src="assets/copyOverAPI_ID.js"></script>
     <script src="assets/copyOverAPI_ID.js"></script>
@@ -55,11 +63,13 @@
     <script src="assets/loadExcelData.js"></script>
     <script src="assets/getSetChemProperties.js"></script>
     <script src="assets/SimpleTreat4_0.js"></script>
+    <script src="assets/xxxAccessBasinDB.js"></script>
     <!-- <script src="assets/xxxgenerateConsumptionTable.js"></script> -->
 
     <!-- local epie data -->
     <script src="data/basin_geo/Basin.js"></script>
     <script src="data/model_inputs/example_chem.js"></script>
+    <script src="data/resources/basins_js/BasinIndex.js"></script>
 
 
   </head>
@@ -859,6 +869,8 @@
 
   <div id="full_settings" class="tabcontent">
     <!-- <div style="height: 25px;"></div> -->
+    
+    <!-- Settings html holders -->
     <h4>Full ePiE settings</h4>
     <p>API properties:</p>
     <pre id="chemDataFull">{Undefined}</pre>
@@ -871,8 +883,11 @@
     <p>Consumption data:</p>
     <pre id="consumptionDataFull">{Undefined}</pre>
 
+    <!-- buttons for testing functions -->
     <div style="height: 10px;"></div>
-    <button class="action_button" style="margin-left: 10px;" type="button" onclick="loadBigData()">Export spatial data</button>
+    <button class="action_button" style="margin-left: 10px;" type="button" onclick="loadBigData()">loadBigData</button>
+    <button class="action_button" style="margin-left: 10px;" type="button" onclick="AccessBasinDB()">AccessBasinDB</button>
+    <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="fileConstructor()">fileConstructor</button> -->
     <div style="height: 10px;"></div>
   </div>
 
@@ -890,8 +905,8 @@
 
     // test for loading basin data later on request
     function loadBigData() {
-      import('./bigData.js').then(({ bigData }) => {
-        console.log('Loaded big data:', bigData);
+      import('./data/resources/basins_js/BasinIndex.js').then(({ BasinIndex }) => {
+        console.log('Loaded big data:', BasinIndex);
       });
     }
 
