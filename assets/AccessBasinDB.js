@@ -236,7 +236,7 @@ getFileMaps = function(){
     // no data check
     if(basin_indx == "{Undefined}"){
         console.log("No basins selected in AccessBasinDB");
-        alert("No basins selected, please select at least one basin to generate the consumption data table");
+        alert("No basins selected, please select at least one basin to proceed.");
         return {
             unique_pts_files: [],
             unique_hl_files: [],

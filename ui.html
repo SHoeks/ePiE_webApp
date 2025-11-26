@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emissions Model UI</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --sidebar-bg: #ffffff;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --text-dark: #1f2937;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      display: flex;
+      height: 100vh;
+      color: var(--text-dark);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .sidebar h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sidebar button {
+      padding: 10px 12px;
+      font-size: 14px;
+      border: none;
+      background: none;
+      text-align: left;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .sidebar button:hover {
+      background: #f3f4f6;
+      color: var(--text-dark);
+    }
+
+    /* Main layout */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow: auto;
+    }
+
+    .page-title {
+      font-size: 26px;
+      margin-bottom: 24px;
+      font-weight: bold;
+    }
+
+    /* Grid layout for settings + map */
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      height: calc(100vh - 100px);
+    }
+
+    /* Card panels */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .card h3 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-bottom: 18px;
+      font-size: 14px;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    /* Map placeholder */
+    .map {
+      background: #eef0f4;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h1>Emissions</h1>
+    <nav>
+      <button>Overview</button>
+      <button>Map Layers</button>
+      <button>Emission Factors</button>
+      <button>Simulation Settings</button>
+      <button>Export & Reporting</button>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="page-title">Overview</div>
+
+    <div class="grid">
+
+      <!-- Settings Column -->
+      <div class="card">
+        <h3>Emission Inputs</h3>
+        <label>CO₂ Level
+          <input type="range" min="0" max="100" />
+        </label>
+        <label>NOₓ Level
+          <input type="range" min="0" max="100" />
+        </label>
+        <label>SO₂ Level
+          <input type="range" min="0" max="100" />
+        </label>
+
+        <h3 style="margin-top: 30px;">Simulation Parameters</h3>
+        <label>Time Horizon (years)
+          <input type="number" value="10" />
+        </label>
+        <label>Region
+          <select>
+            <option>Global</option>
+            <option>Europe</option>
+            <option>North America</option>
+            <option>Asia</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Map Column -->
+      <div class="map">Map Component Placeholder</div>
+
+    </div>
+  </div>
+
+</body>
+</html>

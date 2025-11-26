@@ -1,5 +1,5 @@
-const fs = require("fs");
-export default function CSVtoGeoJSON(s,geojsonpath) {
+// const fs = require("fs");
+function CSVtoGeoJSON(s,geojsonpath) {
 
     s = s.split(/\r?\n|\r|\n/g);
     let h = s[0].split(";");

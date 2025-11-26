@@ -139,10 +139,49 @@ function createBasinMap(selected_basins,selected_basins_names){
                 list.appendChild(node);
               });
 
-
-
-            
           });
+
+          // add initial selected basins to list
+          let list = document.getElementById('selected_basins_list');
+          while (list.firstChild) list.removeChild(list.firstChild);
+          selected_basins.forEach(x => {
+            let x_index = selected_basins.indexOf(x);
+            let x_name = selected_basins_names[x_index];
+            let node = document.createElement("li");
+            node.style.display = "inline-block;"
+            let textnode = document.createTextNode(x + ':' + x_name);
+            node.appendChild(textnode);
+            node.onclick = function(self) {
+              let id = self.target.innerText;
+              id = id.split(':')[0]; // get only the basin id
+              console.log("removing: " + id);
+              let index = selected_basins.indexOf((id));
+              console.log('index: ' + index);
+              if(index > -1) selected_basins.splice(index, 1)
+              if(index > -1) selected_basins_names.splice(index, 1)
+      
+              let polylayers = document.querySelectorAll('#mapBasin > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-overlay-pane > svg > g > path');
+
+              polylayers.forEach(layerIt => {
+                if(layerIt.getAttribute('stroke-opacity') === id){
+                  console.log('removing layer');
+                  layerIt.setAttribute('stroke', 'rgb(51, 136, 255)');
+                  layerIt.setAttribute('fill', 'rgb(51, 136, 255)');
+                  layerIt.setAttribute('stroke-opacity', '1');
+
+                  //console.log(layerIt);
+                }
+              });
+              list.removeChild(node);
+              console.log('Selected_basins: ' + selected_basins);
+              console.log('selected_basins_names: ' + selected_basins_names);
+              selected_basins
+              setBasinSelectSettings(selected_basins,selected_basins_names);
+            };
+            list.appendChild(node);
+          });
+
+
       }
     })
 

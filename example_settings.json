@@ -1,0 +1,84 @@
+{
+  "basinIDs": {
+    "selected_basins": [
+      "124863"
+    ],
+    "selected_basins_names": [
+      "Rhine 1"
+    ]
+  },
+  "apiProperties": {
+    "API": "Ibuprofen",
+    "CAS": "15687-27-1",
+    "class": "acid",
+    "MW": 206.281,
+    "KOW_n": 9332.543,
+    "Pv": 0.025,
+    "S": 21,
+    "pKa": 4.85,
+    "f_uf": 0.2,
+    "k_bio_wwtp": 0.0000013859599048563924,
+    "Kp_ps_n": 10.774,
+    "Kp_as_n": 200.016,
+    "Kp_sd_n": 14.977,
+    "KOC_n": 1793.907,
+    "KOW_alt": 2.9512092241460794,
+    "Kp_ps_alt": 10.774,
+    "Kp_as_alt": 200.016,
+    "Kp_sd_alt": 14.977,
+    "KOC_alt": 94.776,
+    "k_bio_wwtp_n": 0.000197158,
+    "k_bio_wwtp_alt": 0,
+    "k_bio_sw1_n": 0,
+    "k_bio_sw1_alt": 0,
+    "T_bio_sw_n": 293.15,
+    "T_bio_sw_alt": 293.15,
+    "T_bio_sd_n": 293.15,
+    "T_bio_sd_alt": 293.15,
+    "k_hydro_sw_n": 0,
+    "k_hydro_sw_alt": 0,
+    "T_hydro_sw_n": 293.15,
+    "T_hydro_sd_n": 293.15,
+    "T_hydro_sw_alt": 293.15,
+    "T_hydro_sd_alt": 293.15,
+    "k_photo12_sw_n": 0,
+    "k_photo12_sw_alt": 0,
+    "T_photo12_sw_n": 293.15,
+    "T_photo12_sw_alt": 293.15,
+    "alpha_n": 0.000001,
+    "lambda_solar_n": null,
+    "alpha_alt": 0.000001,
+    "lambda_solar_alt": null,
+    "fn_WWTP": 0.007029691439639235,
+    "Kp_ps": 10.774,
+    "Kp_as": 200.01599999999996,
+    "BACT_test": 1000000,
+    "k_bio_sw2_n": 0,
+    "k_bio_sw2_alt": 0,
+    "metab": 0,
+    "API_metab": 0
+  },
+  "wwtpRemovalData": {
+    "custom_wwtp_primary_removal": 0.122,
+    "custom_wwtp_secondary_removal": 0.61568,
+    "custom_wwtp_N_removal": 0,
+    "custom_wwtp_P_removal": 0,
+    "custom_wwtp_UV_removal": 0,
+    "custom_wwtp_Cl_removal": 0,
+    "custom_wwtp_O3_removal": 0,
+    "custom_wwtp_sandfilter_removal": 0,
+    "custom_wwtp_microfilter_removal": 0
+  },
+  "consumptionData": {
+    "DE": 83456.045,
+    "CH": 8962.258,
+    "FR": 68467.362,
+    "NL": 17942.942,
+    "LU": 672.05,
+    "AT": 9158.75,
+    "BE": 11817.096
+  },
+  "flowSelection": {
+    "flow_condition": "Average"
+  }
+}

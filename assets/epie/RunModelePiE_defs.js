@@ -1,9 +1,9 @@
- /* eslint-disable */
-const fs = require('fs');
-const path = require('path');
+//  /* eslint-disable */
+// const fs = require('fs');
+// const path = require('path');
 
 // Extract numeric values from the string (same as AccessBasinDB.js)
-function parseBasinVector(s) {
+export function parseBasinVector(s) {
     const match = s.match(/c\((.*?)\)/);
     if (match) {
         const contents = match[1];
@@ -15,7 +15,7 @@ function parseBasinVector(s) {
 }
 
 // Convert value to numeric, handling errors
-function toNumeric(value, errors = 'coerce') {
+export function toNumeric(value, errors = 'coerce') {
     if (value === null || value === undefined || value === '' || value === 'NA') {
         return errors === 'coerce' ? null : value;
     }
@@ -25,7 +25,7 @@ function toNumeric(value, errors = 'coerce') {
 }
 
 // Check if column exists, create with default value if not
-function checkIfColumnExistsCreateEmpty(data, colname, defaultValue) {
+export function checkIfColumnExistsCreateEmpty(data, colname, defaultValue) {
     if (data.length === 0) return data;
     
     const hasColumn = data[0].hasOwnProperty(colname);
@@ -38,7 +38,7 @@ function checkIfColumnExistsCreateEmpty(data, colname, defaultValue) {
 }
 
 // Placeholder for SimpleTreat4_0 function
-function simpleTreat40(classType, MW, Pv, S, pKa, KpPsN, KpAsN, kBioWwtpN, 
+export function simpleTreat40(classType, MW, Pv, S, pKa, KpPsN, KpAsN, kBioWwtpN, 
                       TAIR, Wind, Inh, EInDaily, uwwPrimary, uwwSeconda) {
     // This function needs to be implemented based on the original SimpleTreat4_0 R function
     // For now, returning a dict with f_rem as placeholder
@@ -46,7 +46,7 @@ function simpleTreat40(classType, MW, Pv, S, pKa, KpPsN, KpAsN, kBioWwtpN,
 }
 
 // Check consumption data availability
-function checkConsumptionData(pts, chem, consData) {
+export function checkConsumptionData(pts, chem, consData) {
     // Filter unique countries where Pt_type is 'WWTP' or 'Agglomerations' and drop NA
     const wwtpPoints = pts.filter(row => 
         (row.Pt_type === 'WWTP' || row.Pt_type === 'Agglomerations') && 
@@ -87,8 +87,9 @@ function checkConsumptionData(pts, chem, consData) {
 }
 
 // Complete chemical properties
-function completeChemProperties(chem) {
+export function completeChemProperties(chem) {
     let chemCopy = JSON.parse(JSON.stringify(chem)); // Deep copy
+    console.log("Completing chemical properties...",chemCopy);
     
     // Ensure primary/secondary removal columns exist
     chemCopy = checkIfColumnExistsCreateEmpty(chemCopy, "custom_wwtp_primary_removal", null);
@@ -158,7 +159,7 @@ function completeChemProperties(chem) {
 }
 
 // Set local parameters with custom removal (simplified version)
-function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi) {
+export function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi) {
     // Make deep copies to avoid modifying original data
     let ptsCopy = JSON.parse(JSON.stringify(pts));
     let HLCopy = HL && HL.length > 0 ? JSON.parse(JSON.stringify(HL)) : null;
@@ -963,7 +964,7 @@ function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi) {
 
 // Compute environmental concentrations (simplified version)
 // Compute environmental concentrations (JavaScript translation of Python function)
-function computeEnvConcentrationsV4Test(pts, HL, verbose = true, Progress_bar, CMD_out_obj) {
+export async function computeEnvConcentrationsV4Test(pts, HL, Progress_bar, CMD_out_obj) {
 
     let progressTxtBackup = CMD_out_obj.innerText + " ";
 
@@ -1059,29 +1060,46 @@ function computeEnvConcentrationsV4Test(pts, HL, verbose = true, Progress_bar, C
     }
 
     // console.log("ptsHylakId:",ptsHylakId)
-    let npoints = ptsID.length;
-    let nhl = HLEmpty ? 0 : HLHylakId.length;
+    var npoints = ptsID.length;
+    var nhl = HLEmpty ? 0 : HLHylakId.length;
     var progressstartPerc = 40;
+    var newtext = "";
+    var progressPercent = progressstartPerc;
+    var prevPercent = progressstartPerc;
+    var printProgress = false;
     
     // Main calculation loop
     while (ptsFin.some(fin => fin === 0)) {
-        if (verbose) {
-            new Promise(resolve => setTimeout(resolve, 50));
-            let nPtsPrint = ptsFin.filter(fin => fin === 0).length;
-            let nHLPrint = HLEmpty ? 0 : HLFin.filter(fin => fin === 0).length;
-            nPtsPrint = npoints-nPtsPrint;
-            nHLPrint = nhl-nHLPrint;
+        
+        prevPercent = structuredClone(progressPercent);
+        prevPercent = Math.floor(prevPercent);
+        let nPtsPrint = ptsFin.filter(fin => fin === 0).length;
+        let nHLPrint = HLEmpty ? 0 : HLFin.filter(fin => fin === 0).length;
+        nPtsPrint = npoints-nPtsPrint;
+        nHLPrint = nhl-nHLPrint;
+        progressPercent = 0;
+        progressPercent = (nPtsPrint / npoints) * 100;
+        if(progressPercent<progressstartPerc) progressPercent = 40;
+        // if(progressPercent>100) progressPercent = 100;
+        // progressPercent = progressstartPerc+=progressPercent;
+        if((prevPercent+1) < (progressPercent)) {
+            printProgress = true;
+            console.log("Printing progress...");
+            console.log("% progressPercent:", progressPercent, "%", nPtsPrint, "/", npoints);
+            console.log("% prevPercent:", prevPercent);
+        } else {
+            printProgress = false;
+        }
+        
+        if(printProgress) {
+            await new Promise(resolve => setTimeout(resolve, 40));
             console.log("# points in pts:", nPtsPrint);
             console.log("# points in HL:", nHLPrint);
-            CMD_out_obj.innerText = progressTxtBackup + `# points in pts: ${nPtsPrint}/${npoints}\n# points in HL: ${nHLPrint}/${nhl}`;
+            newtext = `# points in pts: ${nPtsPrint}/${npoints}\n# points in HL: ${nHLPrint}/${nhl}`;
+            CMD_out_obj.innerText = progressTxtBackup + newtext;
             CMD_out_obj.scrollTop = CMD_out_obj.scrollHeight;
-            let totalItems = npoints + nhl;
-            let processedItems = nPtsPrint + nHLPrint;
-            let progressPercent = totalItems === 0 ? 100 : (processedItems / totalItems) * 60;
-            progressPercent = progressstartPerc+=progressPercent;
             Progress_bar.style.width = progressPercent + "%";
-            new Promise(resolve => setTimeout(resolve, 50));
-            // RunProgress = progressPercent;
+            await new Promise(resolve => setTimeout(resolve, 40));
         }
         
         breakVec1.push(ptsFin.filter(fin => fin === 0).length);
@@ -1207,13 +1225,13 @@ function computeEnvConcentrationsV4Test(pts, HL, verbose = true, Progress_bar, C
     }
 }
 
-module.exports = {
-    parseBasinVector,
-    toNumeric,
-    checkIfColumnExistsCreateEmpty,
-    simpleTreat40,
-    checkConsumptionData,
-    completeChemProperties,
-    setLocalParametersCustomRemovalFast3,
-    computeEnvConcentrationsV4Test
-};
+// module.exports = {
+//     parseBasinVector,
+//     toNumeric,
+//     checkIfColumnExistsCreateEmpty,
+//     simpleTreat40,
+//     checkConsumptionData,
+//     completeChemProperties,
+//     setLocalParametersCustomRemovalFast3,
+//     computeEnvConcentrationsV4Test
+// };

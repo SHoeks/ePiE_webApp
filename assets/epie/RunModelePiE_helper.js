@@ -1,11 +1,11 @@
-/* eslint-disable */
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parser');
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+// /* eslint-disable */
+// const fs = require('fs');
+// const path = require('path');
+// const csv = require('csv-parser');
+// const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 // Read CSV file and return promise with data
-function readCsvFile(filePath, separator = ',', encoding = 'utf8') {
+export function readCsvFile(filePath, separator = ',', encoding = 'utf8') {
     return new Promise((resolve, reject) => {
         const results = [];
         if (!fs.existsSync(filePath)) {
@@ -26,7 +26,7 @@ function readCsvFile(filePath, separator = ',', encoding = 'utf8') {
 }
 
 // Read JSON file (equivalent to reading feather files)
-function readJsonFile(filePath) {
+export function readJsonFile(filePath) {
     return new Promise((resolve, reject) => {
         if (!fs.existsSync(filePath)) {
             resolve([]);
@@ -49,7 +49,7 @@ function readJsonFile(filePath) {
 }
 
 // Write data to CSV file
-function writeCsvFile(data, filePath, separator = ';') {
+export function writeCsvFile(data, filePath, separator = ';') {
     return new Promise((resolve, reject) => {
         if (data.length === 0) {
             resolve();
@@ -70,7 +70,7 @@ function writeCsvFile(data, filePath, separator = ';') {
 }
 
 // Convert numeric string to number, handling errors
-function toNumeric(value, errors = 'coerce') {
+export function toNumeric(value, errors = 'coerce') {
     if (value === null || value === undefined || value === '' || value === 'NA') {
         return errors === 'coerce' ? null : value;
     }
@@ -80,18 +80,18 @@ function toNumeric(value, errors = 'coerce') {
 }
 
 // Get unique values from array column
-function getUniqueValues(data, column) {
+export function getUniqueValues(data, column) {
     const values = data.map(row => row[column]).filter(val => val !== null && val !== undefined);
     return [...new Set(values)];
 }
 
 // Filter dataframe by column values
-function filterDataFrame(data, column, values) {
+export function filterDataFrame(data, column, values) {
     return data.filter(row => values.includes(String(row[column])));
 }
 
 // Remove columns that start with "Unnamed"
-function removeUnnamedColumns(data) {
+export function removeUnnamedColumns(data) {
     if (data.length === 0) return data;
     
     const filteredData = data.map(row => {
@@ -108,56 +108,48 @@ function removeUnnamedColumns(data) {
 }
 
 // Merge two datasets on specified columns
-function mergeDataFrames(left, right, onColumns, how = 'left') {
-    const result = [];
+export function mergeDataFrames(pts, flow) {
     
-    for (const leftRow of left) {
-        let matched = false;
-        
-        for (const rightRow of right) {
-            // Check if all join columns match
-            const matches = onColumns.every(col => 
-                String(leftRow[col]) === String(rightRow[col])
-            );
-            
-            if (matches) {
-                // Merge the rows
-                const mergedRow = { ...leftRow };
-                for (const [key, value] of Object.entries(rightRow)) {
-                    if (!onColumns.includes(key)) {
-                        mergedRow[key] = value;
-                    }
-                }
-                result.push(mergedRow);
-                matched = true;
-                break;
-            }
-        }
-        
-        if (!matched && how === 'left') {
-            // Add the left row with null values for right columns
-            const mergedRow = { ...leftRow };
-            if (right.length > 0) {
-                for (const key of Object.keys(right[0])) {
-                    if (!onColumns.includes(key)) {
-                        mergedRow[key] = null;
-                    }
-                }
-            }
-            result.push(mergedRow);
-        }
+    for( let i=0; i<pts.length; i++){
+        pts[i]['tmpid_pts'] = String(pts[i]['basin_id']) + "_" + String(pts[i]['ID']);
+        flow[i]['tmpid_flow'] = String(flow[i]['basin_id']) + "_" + String(pts[i]['ID']);
     }
+
+    // console.log("Merging data on 'tmpid'...");
+    // console.log("- pts length:", pts.length);
+    // console.log("- flow length:", flow.length);
+    // console.log("- pts", pts);
+    // console.log("- flow", flow);
+
+    const flowIndex = new Map();
+    flow.forEach(row => {
+        flowIndex.set(row['tmpid_flow'], row);
+    });
+
+    const merged = pts.map(ptsRow => {
+        const flowRow = flowIndex.get(ptsRow['tmpid_pts']) || {};
+        return { ...ptsRow, ...flowRow };
+    });
+
+    // Clean up temporary keys
+    merged.forEach(row => {
+        delete row['tmpid_pts'];
+        delete row['tmpid_flow'];
+    });
+
+    // console.log("- merged", merged);
+    return merged;
     
-    return result;
 }
 
-module.exports = {
-    readCsvFile,
-    readJsonFile,
-    writeCsvFile,
-    toNumeric,
-    getUniqueValues,
-    filterDataFrame,
-    removeUnnamedColumns,
-    mergeDataFrames
-};
+// module.exports = {
+//     readCsvFile,
+//     readJsonFile,
+//     writeCsvFile,
+//     toNumeric,
+//     getUniqueValues,
+//     filterDataFrame,
+//     removeUnnamedColumns,
+//     mergeDataFrames
+// };
+

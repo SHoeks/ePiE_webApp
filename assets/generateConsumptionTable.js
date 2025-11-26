@@ -1,11 +1,17 @@
 async function generateConsumptionTableWrapper(){
 
+    // show progress
+    let btn_obj = document.getElementById("gen_cons_table_btn")
+    btn_obj.style.color = "#ffffff"
+    btn_obj.style.background = "#b83734"
+    btn_obj.innerText = "Generating table, please wait..."
+
 
     // check if current cons table is empty or not 
     let tableempty = document.querySelector("#API_table_consumption").innerHTML === "<tbody></tbody>"
     if(!tableempty) console.log("Table not empty");
 
-    document.querySelector("#progress_gen_table_cons").style.display = "inline-block";
+    // document.querySelector("#progress_gen_table_cons").style.display = "inline-block";
     
     // Get file maps and basin mappings
     const {unique_pts_files,unique_hl_files,unique_flow_files,pts_basin_map,hl_basin_map,flow_basin_map} = getFileMaps();
@@ -14,7 +20,7 @@ async function generateConsumptionTableWrapper(){
     if(unique_pts_files.length === 0){
         console.log("No basins selected");
         // alert("No basins selected, please select at least one basin to generate the consumption data table");
-        document.querySelector("#progress_gen_table_cons").style.display = "none";
+        // document.querySelector("#progress_gen_table_cons").style.display = "none";
         return; // No basins selected or error occurred
     }
 
@@ -64,11 +70,19 @@ async function generateConsumptionTableWrapper(){
 
     // show loading info
     if(out==1) document.querySelector("#cons_edit_buttons").style.display = "inline-block";
-    document.querySelector("#progress_gen_table_cons").style.display = "none";
+    // document.querySelector("#progress_gen_table_cons").style.display = "none";
 
     // copy over API_ID to other tables and set consumption to settings
     copyOverAPI_ID();
     setConsumptionToSettings();
+
+    // reset progress indicators
+    btn_obj.style.color = "black"
+    btn_obj.style.background = "white"
+    btn_obj.innerText = "Generate table"
+    console.log('Processing completed successfully!');
+    //Progress_bar.style.transition = 'width 1s ease-in-out';
+    // Progress_bar.style.width = 20 + "%";
 
 }
 
@@ -248,30 +262,66 @@ setConsumptionToSettings = function(){
     // html objects
     let consCntTableRows = document.querySelector("#API_table_consumption").querySelectorAll("tr");
     let output = document.querySelector("#consumptionDataFull");
+    let basins = document.querySelector("#selectedBasinsDataFull");
     
     // col indices
     let cnt_code = 1;
     let cons_value = 3;
 
     // check if table has data
-    if(consCntTableRows.length <= 1){
-        console.log("No table data to set consumption settings");
+    if(consCntTableRows.length <= 1 && basins.textContent === "{Undefined}"){
+        console.log("No table data to set consumption settings & no basins selected.");
         output.textContent = "{Undefined}";
         return;
     }
-
-    // extract settings
-    var settings = {};
-    for(let i=1; i < consCntTableRows.length; i++){ // skip header row
-        let cols = consCntTableRows[i].getElementsByClassName("tableFieldCons");
-        let country_code = cols[cnt_code].value;
-        let cons_value_kgyear = parseFloat(cols[cons_value].value);
-        settings[country_code] = cons_value_kgyear;
+    
+    // used when loading settings from file but no table data yet
+    if(consCntTableRows.length <= 1 && basins.textContent !== "{Undefined}" && output.textContent !== "{Undefined}"){
+        console.log("No table data to set consumption settings, but basins selected.");
+        let storeConsData = output.textContent;
+        let consData = JSON.parse(storeConsData);
+        generateConsumptionTableWrapper();
+        output.textContent = JSON.stringify(consData, null, 2);
+        return;
     }
 
-    // output to settings div
-    output.textContent = JSON.stringify(settings, null, 2);
+    // extract consumption data from table set by user
+    if(consCntTableRows.length > 1){
+        
+        // extract settings from input table
+        var settings = {};
+        for(let i=1; i < consCntTableRows.length; i++){ // skip header row
+            let cols = consCntTableRows[i].getElementsByClassName("tableFieldCons");
+            let country_code = cols[cnt_code].value;
+            let cons_value_kgyear = parseFloat(cols[cons_value].value);
+            settings[country_code] = cons_value_kgyear;
+        }
 
+        // check if all settings in user table are null, setting are probably loaded from file
+        let allNull = Object.values(settings).every(value => isNaN(value) || value === null);
+        if(!allNull){
+            // output to settings div
+            output.textContent = JSON.stringify(settings, null, 2);
+        }else{
+            // settings are loaded from file, keep those instead
+            let storeConsData = output.textContent;
+            let consData = JSON.parse(storeConsData);
+            
+            // copy values from loaded settings to table
+            for(let i=1; i < consCntTableRows.length; i++){ // skip header row
+                let cols = consCntTableRows[i].getElementsByClassName("tableFieldCons");
+                let country_code = cols[cnt_code].value;
+                if(country_code in consData){
+                    let cons_value_kgyear = consData[country_code];
+                    cols[cons_value].value = cons_value_kgyear;
+                }
+            }
+
+            // keep loaded settings
+            output.textContent = JSON.stringify(consData, null, 2);
+        }
+
+    }
 }
 
 

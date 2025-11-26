@@ -1,4 +1,4 @@
-export default function checkTabLocks(lockedTabs) {
+function checkTabLocks(lockedTabs) {
 
     console.log("checkTabLocks")
     console.log(lockedTabs)

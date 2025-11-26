@@ -1,6 +1,6 @@
-import { dialog } from '@electron/remote'
-import fs from 'fs'
-const path = require('path');
+// import { dialog } from '@electron/remote'
+// import fs from 'fs'
+// const path = require('path');
 
 function median(numbers) {
     const sorted = Array.from(numbers).sort((a, b) => a - b);
@@ -18,63 +18,50 @@ function mean(numbers) {
     return sum / numbers.length;
 }
 
-export default function CalculateBasinStatistics(fullTempPathDir) {
+// export default 
+function CalculateBasinStatistics( ) {
 
     console.log("CalculateBasinStatistics")
-    console.log(fullTempPathDir)
-    var APICSVTemplateFullPath = path.join(fullTempPathDir, "pts_out.csv"); + 
-    console.log(APICSVTemplateFullPath)
+
+    // retreive ePie results
+    const pts = epie_results; // assuming ePie_results is an array of objects with x, y, and other properties
     
-    // check if file exists
-    if (!fs.existsSync(APICSVTemplateFullPath)) {
-        console.log('File not found!');
-        dialog.showMessageBox({
-          title: 'No results found',
-          message: 'Unable to generate file, no results found. Please run ePiE first.',
-          buttons: ['OK']
-        })
+    // stop if results are null or length 0
+    if(pts === null){
+        console.log('No ePiE results found!');
+        alert('Unable to generate map, no results found. Please run ePiE first.');
+        return;
+    }           
+    if(pts.length === 0){
+        console.log('No ePiE results found!');
+        alert('Unable to generate map, no results found. Please run ePiE first.');
         return;
     }
 
-    let elem = document.querySelector("#API_table_basinStats > tbody");
-    let innerHTML = "";
-
-    let read_stream = fs.readFileSync(APICSVTemplateFullPath); //
-    let csv_string = read_stream.toString();
-    csv_string = csv_string.split(/\r?\n|\r|\n/g);
-
-    ///////////////////////////////////////////////
-    
-    let h = csv_string[0].split(";");
-    let c_w_index = h.indexOf("C_w");
-    let basin_ID_index = h.indexOf("basin_ID");
-    let unique_basin_IDs = [];
-    for (let i = 1; i < csv_string.length; i++) {
-        let line = csv_string[i].split(";");
-        let basin_ID = line[basin_ID_index];
-        if (basin_ID === undefined || basin_ID === "") continue; // skip empty lines
-        if(!unique_basin_IDs.includes(basin_ID)){
-            unique_basin_IDs.push(basin_ID);
+    // get unique basin IDs
+    const unq_b_id = [];
+    for(i=0; i<pts.length; i++){
+        if(!unq_b_id.includes(pts[i].basin_ID)){
+            unq_b_id.push(pts[i].basin_ID);
         }
     }
-    console.log("unique_basin_IDs: ", unique_basin_IDs.length, unique_basin_IDs);
-
-
-
-    console.log("c_w_index: ", c_w_index);
+    console.log("unique basin IDs: ", unq_b_id.length, unq_b_id);
+    
     let c_w = 0.0;
     let basin_ID = 0;
     let c_w_sum_per_basin = Array.apply(null, Array(unique_basin_IDs.length)).map(Number.prototype.valueOf,0.0);
     let n_per_basin = Array.apply(null, Array(unique_basin_IDs.length)).map(Number.prototype.valueOf,0.0);
     let values_per_basin = [[]];
     let values_per_basin_dnWWTP = [[]];
-    for (let i = 1; i < csv_string.length; i++) {
-        let line = csv_string[i].split(";");
-        c_w = line[c_w_index];
-        basin_ID = line[basin_ID_index];
+    for (let i = 1; i < pts.length; i++) {
+        let line = pts[i];
+        c_w = line.C_w;
+        basin_ID = line.basin_ID;
         if (c_w === undefined || c_w === "") continue; // skip empty lines
         if (basin_ID === undefined || basin_ID === "") continue; // skip empty lines
-        let basin_index = unique_basin_IDs.indexOf(basin_ID);
+
+
+        let basin_index = unq_b_id.indexOf(basin_ID);
         c_w_sum_per_basin[basin_index] += parseFloat(c_w);
         n_per_basin[basin_index] += 1.0;
         

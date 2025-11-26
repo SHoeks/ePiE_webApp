@@ -267,7 +267,7 @@ table input[type="text"]:read-only {
   font-weight: 300;
   text-shadow: 0 0.04em 0.04em rgba(255, 255, 255, 0.253);
   text-align: center;
-  /* transition: all 0.2s; */
+  transition: all 0.5s;
   border-color: grey !important;
   color: black;
   background-color: white;
@@ -293,7 +293,7 @@ button {
 
 
 #gen_cons_table_btn:active:after {
-  content: ': processing, please wait...';
+  content: ':...';
 }
 
 #simpletreat40_btn:active  {
@@ -306,7 +306,7 @@ button {
 
 
 #simpletreat40_btn:active:after {
-  content: ': processing, please wait...';
+  content: ':...';
 }
 
 #runAPIcompletebtn:active  {
@@ -319,11 +319,8 @@ button {
 
 
 #runAPIcompletebtn:active:after {
-  content: ': processing, please wait...';
+  content: ':...';
 }
-
-
-
 
 /* ePiE run button */
 .process_active  {
@@ -334,7 +331,7 @@ button {
   opacity: 1;
 }
 .process_active:after {
-  content: ': processing, please wait...';
+  content: ':...';
 }
 
 
@@ -584,7 +581,7 @@ button {
 }
 
 #outputmaplegend{
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.91);
   border-radius: 0.3em;
   box-sizing: border-box;
   text-decoration: none;
