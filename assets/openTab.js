@@ -3,6 +3,20 @@ function openTabWrapper(evt, tabName) {
 
   // check if tab is locked
   console.log("locked: " + tabName + " = " + lockedTabs[tabName]);
+  
+  var titleObj = document.querySelector("body > div.main > div.page-title");
+
+  titleObj.innerHTML = "";
+  if(tabName=="Welcome_screen") titleObj.innerHTML = "Welcome";
+  if(tabName=="API_properties") titleObj.innerHTML = "API Properties";
+  if(tabName=="Degradation") titleObj.innerHTML = "WWTP removal";
+  if(tabName=="Basin_select") titleObj.innerHTML = "River Basin";
+  if(tabName=="Consumption") titleObj.innerHTML = "Consumption data";
+  if(tabName=="Run_process") titleObj.innerHTML = "Run ePiE";
+  if(tabName=="Map_results") titleObj.innerHTML = "Map Results";
+  if(tabName=="Basin_result_stats") titleObj.innerHTML = "Output statistics";
+  if(tabName=="PNEC_Map_results") titleObj.innerHTML = "Map risks";
+  if(tabName=="full_settings") titleObj.innerHTML = "View Settings";
 
   // open tab if it is not locked
   if (!lockedTabs[tabName]) {
@@ -36,6 +50,7 @@ function openTab(evt, tabName) {
   console.log(evt)
   console.log(tabName)
   console.log(evt.currentTarget)
+
   
   var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
@@ -52,6 +67,10 @@ function openTab(evt, tabName) {
 }
 
 function openWelcomeTab(tabName, tabn) {
+
+    var titleObj = document.querySelector("body > div.main > div.page-title");
+    titleObj.innerHTML = "Welcome";
+    console.log("openWelcomeTab called")
   
     console.log(tabName)
     var i, tabcontent, tablinks;

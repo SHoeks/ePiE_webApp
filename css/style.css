@@ -39,7 +39,8 @@
 #myBar {
   width: 0%;
   height: 25px;
-  background-color: #04AA6D;
+  border-radius: 4px;
+  background-color: #2563eb;
   transition: width 0.4s ease;
 }
 
@@ -82,6 +83,7 @@
   background-color: #f1f1f1;
   margin-top: 10px;
   margin-bottom: 10px;
+  border-radius: 8px;
 }
 
 p {
@@ -94,11 +96,13 @@ p {
   background-color: #f1f1f1;
   margin-top: 10px;
   margin-bottom: 10px;
+  border-radius: 8px;
 }
 
 #mapBasin { 
   height: 55vh; 
   max-width: 1360px;
+  border-radius: 8px;
 }
 
 body {
@@ -256,7 +260,7 @@ table input[type="text"]:read-only {
 #consHeaderHoverInfo {display: none;}
 
 
-.action_button {
+/* .action_button {
   display: inline-block;
   padding: 0.3em 1em;
   margin: 0 0.4em 0.3em 0;
@@ -271,16 +275,41 @@ table input[type="text"]:read-only {
   border-color: grey !important;
   color: black;
   background-color: white;
-}
+} */
 
-button {
-  background-color: white;
+.action_button {
+    display: inline-block;
+    padding: 10px 14px;
+    margin: 0.4em 0.4em 0.3em 0;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: #1f2937; /* muted text */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    border-style: solid;
+    border-width: 2px;
+    background-color: #f3f4f69b;
+    border-color: #1f2937;
+    transition: background 0.25s ease, 
+                color 0.25s ease, 
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
 }
 
 .action_button:hover {
-  color: #ffffff;
-  background-color: rgb(100,100,100);
+    background-color: #f3f4f69b;
+    border-color: #2563eb;
+    color: black;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+
+
+
+
 
 #gen_cons_table_btn:active  {
   background-color:#b83734 !important;
@@ -482,26 +511,30 @@ button {
 .firstSpan .secondSpan {
   visibility: hidden;
   width: 170px;
-  background-color: gray;
-  color: #fff;
+  background-color: #f3f4f6;
+  color: #000000;
   text-align: center;
   border-radius: 6px;
   padding: 10px 10px;
   position: absolute;
   z-index: 1;
-  margin-top: 40px;
-  margin-left: -20px;
+  margin-top: 00px;
+  margin-left: -75px;
   font-size: 15px;
+  border-color:#2563eb;
+  border-width: 2px;
+  border-style: solid;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.51);
 }
 
 #API_table2 > tbody > tr .secondSpan {
-  margin-left: -20px;
-  margin-top: 40px;
+  margin-left: -75px;
+  margin-top: 00px;
 }
 
 #API_table_basinStats > tbody > tr .secondSpan {
-  margin-left: -20px;
-  margin-top: 40px;
+  margin-left: -75px;
+  margin-top: 00px;
 }
 
 
@@ -526,8 +559,12 @@ button {
 }
 
 .hover_unit{
-  color:orange;
+  color:#2563eb;
   margin-bottom: 1px;
+  font-size: 0.8rem !important;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  padding: 1px 4px;
 }
 
 .collapsible_content {
@@ -537,6 +574,8 @@ button {
   background-color: #f1f1f1;
   max-width: 1360px;
   font-size: 0.9rem;
+  margin-top: 10px;
+  border-radius: 8px;
 }
 
 #prnt_slct_flow {
@@ -598,4 +637,8 @@ button {
   border-radius: 5px;
   display: inline-block;
   margin-right: 5px;
+}
+
+table input {
+  text-align: center;
 }

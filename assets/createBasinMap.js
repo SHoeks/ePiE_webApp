@@ -37,6 +37,17 @@ function createBasinMap(selected_basins,selected_basins_names){
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map)
 
+    // var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    //   attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    //   maxZoom: 19
+    // }).addTo(map);
+
+    // var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    //   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    //   subdomains: 'abcd',
+    //   maxZoom: 20
+    // }).addTo(map);
+
     // var rawdata = fs.readFileSync('resources/basin_geo/Basin.geojson');
     var basinBorders= BasinSHP;
     console.log(basinBorders.features.length);

@@ -46,7 +46,8 @@ function CalculateBasinStatistics( ) {
         }
     }
     console.log("unique basin IDs: ", unq_b_id.length, unq_b_id);
-    
+    const unique_basin_IDs = unq_b_id;
+
     let c_w = 0.0;
     let basin_ID = 0;
     let c_w_sum_per_basin = Array.apply(null, Array(unique_basin_IDs.length)).map(Number.prototype.valueOf,0.0);
@@ -134,6 +135,7 @@ function CalculateBasinStatistics( ) {
         </tr>`
     }
 
+    let elem = document.querySelector("#API_table_basinStats")
     innerHTML = header + data;
     elem.innerHTML = innerHTML;
 

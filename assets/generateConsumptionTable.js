@@ -19,8 +19,12 @@ async function generateConsumptionTableWrapper(){
         // reset progress indicators
     if(unique_pts_files.length === 0){
         console.log("No basins selected");
-        // alert("No basins selected, please select at least one basin to generate the consumption data table");
-        // document.querySelector("#progress_gen_table_cons").style.display = "none";
+        alert("No basins selected, please select at least one basin to generate the consumption data table");
+        document.querySelector("#progress_gen_table_cons").style.display = "none";
+        btn_obj.style.color = "black"
+        btn_obj.style.background = "white"
+        btn_obj.innerText = "Generate table"
+        emptyConsTable();
         return; // No basins selected or error occurred
     }
 
@@ -84,6 +88,15 @@ async function generateConsumptionTableWrapper(){
     //Progress_bar.style.transition = 'width 1s ease-in-out';
     // Progress_bar.style.width = 20 + "%";
 
+}
+
+function emptyConsTable(){
+    document.querySelector("#API_table_consumption > tbody:nth-child(1)").innerHTML = "";
+    document.querySelector("#cons_edit_buttons").style.display = "none";
+    document.querySelector("#avg_per_capita_cons_table").style.display = "none";
+    document.querySelector("#div_container_pop_year").style.display = "none";
+    document.getElementById("consHeaderHoverInfo").style.display = "none";
+    document.querySelector("#Consumption > div > div:nth-child(3) > form:nth-child(8)").style.display = "none";
 }
 
 function createConsTable(cons_dat_type,rptMStateK_count_sorted) {
@@ -177,6 +190,8 @@ function createConsTable(cons_dat_type,rptMStateK_count_sorted) {
       fields[i].readOnly = true;
       fields[i].style.border = "none";
     }
+
+    document.querySelector("#Consumption > div > div:nth-child(3) > form:nth-child(8)").style.display = "block";
 
 
     return 1;
