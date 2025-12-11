@@ -1,3 +1,5 @@
+
+
 // Example function use this in other parts of the app to access basin data
 async function ExampleAccessBasinData() {
 
@@ -45,7 +47,7 @@ async function ExampleAccessBasinData() {
 
 }
 
-rbindBasinData = function(){
+function rbindBasinData(){
     // rbind data from global_pts_data, global_hl_data, global_flow_data
     // into a single data structure for further processing
     var pts_tmp = [];
@@ -206,7 +208,6 @@ function fileConstructor(){
 
 }
     
-
 async function loadBasinData(filePath, basinIds){
     // console.log("Loading basin data from:", filePath, "for basin IDs:", basinIds);
     const module = await import(filePath);
@@ -228,7 +229,7 @@ async function loadBasinData(filePath, basinIds){
     return filteredData;
 }
 
-getFileMaps = function(){
+function getFileMaps(){
     
     const basinSetObj = document.getElementById('selectedBasinsDataFull');
     const basin_indx = basinSetObj.textContent;
@@ -355,3 +356,18 @@ getFileMaps = function(){
         flow_basin_map: flow_basin_map
     };
 }
+
+// add function to use them globally
+window.ExampleAccessBasinData = ExampleAccessBasinData;
+window.getFileMaps = getFileMaps;
+window.fileConstructor = fileConstructor;
+window.loadBasinData = loadBasinData;
+window.readptsFiles = readptsFiles;
+window.readhlFiles = readhlFiles;
+window.readflowFiles = readflowFiles;
+window.completeData = completeData;
+window.rbindBasinData = rbindBasinData;
+
+
+
+
