@@ -339,5 +339,131 @@ setConsumptionToSettings = function(){
     }
 }
 
+getFileMaps = function(){
+    
+    const basinSetObj = document.getElementById('selectedBasinsDataFull');
+    const basin_indx = basinSetObj.textContent;
+    
+    // no data check
+    if(basin_indx == "{Undefined}"){
+        console.log("No basins selected in AccessBasinDB");
+        alert("No basins selected, please select at least one basin to proceed.");
+        return {
+            unique_pts_files: [],
+            unique_hl_files: [],
+            unique_flow_files: [],
+            pts_basin_map: {},
+            hl_basin_map: {},
+            flow_basin_map: {}
+        };
+    }
 
+    const basin_indx_array = JSON.parse(basin_indx).selected_basins;
+    console.log("Basin indices to process:", basin_indx_array);
+
+    const basin_file_idx = [];
+    for(let i=0; i<basin_indx_array.length; i++){
+        let basin_id = basin_indx_array[i];
+        let file_idx = BasinIndex[basin_id][0];
+        if(file_idx !== undefined){
+            basin_file_idx.push({ basin_id: basin_id, file_index: file_idx });
+        } else {
+            console.warn(`Basin ID ${basin_id} not found in BasinIndex`);
+        }
+    }
+
+    console.log('Basin File Indices:', basin_file_idx);
+
+    const filePaths = fileConstructor();
+    console.log("File paths from fileConstructor:", filePaths);
+
+    var flow_selector = "avg"
+    const flowDatObj = document.getElementById('selectedFlowDataFull');
+    const flow_selector_str = flowDatObj.textContent;
+    if(flow_selector_str != "{Undefined}"){
+        let flow_selector_json = JSON.parse(flow_selector_str);
+        let flow_condition = flow_selector_json.flow_condition;
+        if(flow_condition == "Average"){
+            flow_selector = "avg";
+        } else if(flow_condition == "Min"){
+            flow_selector = "mi";
+        } else if(flow_condition == "Max"){
+            flow_selector = "ma";
+        } else {
+            flow_selector = "avg";
+        }
+    }
+    console.log("Selected flow condition:", flow_selector);
+    
+    const basin_file_idx_with_file = [];
+    for(let i=0; i<basin_indx_array.length; i++){
+        let basin_id = basin_indx_array[i];
+        let file_idx = BasinIndex[basin_id][0];
+        if(file_idx !== undefined){
+            basin_file_idx_with_file.push({ 
+                basin_id: basin_id, 
+                file_index: file_idx, 
+                pts_file_path: filePaths["pts"][file_idx],
+                hl_file_path: filePaths["hl"][file_idx],
+                flow_file_path: filePaths[flow_selector][file_idx]
+            });
+        } else {
+            console.warn(`Basin ID ${basin_id} not found in BasinIndex`);
+        }
+    }
+    console.log('Basin File Indices with File Paths:', basin_file_idx_with_file);
+
+    unique_pts_files = [];
+    unique_hl_files = [];
+    unique_flow_files = [];
+    for(let i=0; i<basin_file_idx_with_file.length; i++){
+        let basin_entry = basin_file_idx_with_file[i];
+        if(!unique_pts_files.includes(basin_entry.pts_file_path)){
+            unique_pts_files.push(basin_entry.pts_file_path);
+        }
+        if(!unique_hl_files.includes(basin_entry.hl_file_path)){
+            unique_hl_files.push(basin_entry.hl_file_path);
+        }
+        if(!unique_flow_files.includes(basin_entry.flow_file_path)){
+            unique_flow_files.push(basin_entry.flow_file_path);
+        }
+    }
+    // console.log("Unique pts files to process:", unique_pts_files);
+    // console.log("Unique hl files to process:", unique_hl_files);
+    // console.log("Unique flow files to process:", unique_flow_files);
+
+    // get corrospoding basin IDs for each unique file
+    const pts_basin_map = {};
+    const hl_basin_map = {};
+    const flow_basin_map = {};
+    for(let i=0; i<basin_file_idx_with_file.length; i++){
+        let basin_entry = basin_file_idx_with_file[i];
+        if(!(basin_entry.pts_file_path in pts_basin_map)){
+            pts_basin_map[basin_entry.pts_file_path] = [];
+        }
+        pts_basin_map[basin_entry.pts_file_path].push(basin_entry.basin_id);
+
+        if(!(basin_entry.hl_file_path in hl_basin_map)){
+            hl_basin_map[basin_entry.hl_file_path] = [];
+        }
+        hl_basin_map[basin_entry.hl_file_path].push(basin_entry.basin_id);
+
+        if(!(basin_entry.flow_file_path in flow_basin_map)){
+            flow_basin_map[basin_entry.flow_file_path] = [];
+        }
+        flow_basin_map[basin_entry.flow_file_path].push(basin_entry.basin_id);
+    }
+    console.log("Pts basin map:", pts_basin_map);
+    console.log("Hl basin map:", hl_basin_map);
+    console.log("Flow basin map:", flow_basin_map);
+
+    return {
+        unique_pts_files: unique_pts_files,
+        unique_hl_files: unique_hl_files,
+        unique_flow_files: unique_flow_files,
+        pts_basin_map: pts_basin_map,
+        hl_basin_map: hl_basin_map,
+        flow_basin_map: flow_basin_map
+    };
+}
 
