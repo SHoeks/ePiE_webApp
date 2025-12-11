@@ -54,10 +54,23 @@ function createPNECOutputMap( ) {
 
   // sample points if too many
   let sampleSize = 100000;
+  function randomInt(maxIndex) {
+    return Math.floor(Math.random() * (maxIndex + 1));
+  }
   if(pts.length>sampleSize){
     console.log('Sampling points ...');
     console.log('pts.length before sampling: ' + pts.length);
-    pts = _.sample(pts, sampleSize);
+    keep_idxs = [];
+    for(let i=0; i<sampleSize; i++){
+      let rand_idx = randomInt(pts.length-1);
+      while(keep_idxs.includes(rand_idx)){
+        rand_idx = randomInt(pts.length-1);
+      }
+      keep_idxs.push(rand_idx);
+    }
+    pts = pts.filter(function(pt, index) {
+      return keep_idxs.includes(index);
+    });
     console.log('pts.length after sampling: ' + pts.length);
   }
   
