@@ -467,3 +467,40 @@ getFileMaps = function(){
     };
 }
 
+function fileConstructor(){
+
+    // number of files to construct
+    const nfiles = 30; 
+    const itstart = 1;
+
+    // check if baseHydroDataPath and with trailing slash exists
+    if(typeof baseHydroDataPath === 'undefined' || !baseHydroDataPath.endsWith('/')){
+        console.error("baseHydroDataPath is not defined or does not end with a '/'");
+        return undefined;
+    }
+    
+    // construct file paths
+    var files = [];
+    files["avg"] = []; files["ma"] = []; files["mi"] = []; files["hl"] = []; files["pts"] = [];
+    for(let i=0; i<(nfiles+itstart); i++){
+        let intdexStr = i.toString().padStart(6, '0');
+        if(i<itstart){ 
+            files["avg"].push("");
+            files["ma"].push("");
+            files["mi"].push("");
+            files["hl"].push("");
+            files["pts"].push("");
+            continue; 
+        }
+        files["avg"].push(`${baseHydroDataPath}avg_${intdexStr}.js`);
+        files["ma"].push(`${baseHydroDataPath}ma_${intdexStr}.js`);
+        files["mi"].push(`${baseHydroDataPath}mi_${intdexStr}.js`);
+        files["hl"].push(`${baseHydroDataPath}hl_${intdexStr}.js`);
+        files["pts"].push(`${baseHydroDataPath}pts_${intdexStr}.js`);
+    }
+    //console.log("Constructed file paths:", files);
+
+    // return file paths
+    return files;
+
+}
