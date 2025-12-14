@@ -21,7 +21,7 @@ function createBasinMap(selected_basins,selected_basins_names){
       }
     }
 
-    var map = L.map('mapBasin').setView([50, 8], 6);
+    var map = L.map('mapBasin').setView([50, 8], 5);
 
     var myRenderer = L.canvas({ padding: 0.5 });
 

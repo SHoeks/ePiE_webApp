@@ -177,8 +177,18 @@ function createOutputMap() {
           });
       },
       onEachFeature: function (feature, layer) {
-          // layer.bindPopup('<p> ug/L: '+ feature.properties.C_w + ' ' + Math.log10(feature.properties.C_w));
-          layer.bindPopup('<p> ug/L: '+ feature.properties.C_w + '<br> Pt_type: ' + feature.properties.Pt_type + '</p>');
+          // layer.bindPopup(
+          //   '<p> ug/L: '+ feature.properties.C_w + 
+          //   '<br> Pt_type: ' + feature.properties.Pt_type + 
+          //   '</p>'
+          // );
+          layer.bindPopup( 
+            '<p> ug/L: '+ feature.properties.C_w + 
+            '<br> Pt_type: ' + feature.properties.Pt_type + 
+            '<br> WWTPremoval: ' + feature.properties.WWTPremoval + 
+            '<br> ptsFremWWTP: ' + feature.properties.ptsFremWWTP + 
+            '</p>'
+          );
       }
   })
 

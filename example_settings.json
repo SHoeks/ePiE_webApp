@@ -1,10 +1,10 @@
 {
   "basinIDs": {
     "selected_basins": [
-      "124863"
+      "107287"
     ],
     "selected_basins_names": [
-      "Rhine 1"
+      "Ouse"
     ]
   },
   "apiProperties": {
@@ -70,13 +70,7 @@
     "custom_wwtp_microfilter_removal": 0
   },
   "consumptionData": {
-    "DE": 83456.045,
-    "CH": 8962.258,
-    "FR": 68467.362,
-    "NL": 17942.942,
-    "LU": 672.05,
-    "AT": 9158.75,
-    "BE": 11817.096
+    "UK": 6760.28
   },
   "flowSelection": {
     "flow_condition": "Average"
