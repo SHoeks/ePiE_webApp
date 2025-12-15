@@ -13,7 +13,8 @@ wd = "/Users/osx/Documents/GithubLocal/ePiE_webApp/data/resources/" # extract ba
 setwd(wd)
 
 # make js dir
-dir.create("basins_js", showWarnings = FALSE)
+basindir = "basins_js2"
+dir.create(basindir, showWarnings = FALSE)
 
 # csv files
 csvf = list.files("basins/", pattern = "\\.csv$", recursive = TRUE, full.names = TRUE)
@@ -44,7 +45,7 @@ dim(d)
 all(names(dlist) == d$basin_id)
 djs = toJSON(dlist, pretty = FALSE)
 djs2 = paste0("const BasinIndex = ","\n",djs,"\n",";")
-write(djs2, file = "basins_js/BasinIndex.js")
+write(djs2, file = paste0(basindir, "/BasinIndex.js"))
 
 # remove processed file
 csvf = csvf[-which_basinindex, ]
@@ -66,6 +67,12 @@ for (i in 1:nrow(csvf)) {
     d$snap_dist = NULL
     d$Dist_down = round(d$Dist_down, 2)
     d$dist_nxt = round(d$dist_nxt, 2)
+  }
+  if(!is.null(d$f_STP)){
+    minFSTP = min(d$f_STP[d$f_STP!=0], na.rm=TRUE)
+    d$f_STP[d$f_STP==0] = minFSTP/10
+    d$f_STP_log10 = round(log10(d$f_STP), 3)
+    d$f_STP = NULL
   }
   basin_ids = unique(d$basin_id)
   dlist = list()
@@ -89,7 +96,7 @@ for (i in 1:nrow(csvf)) {
   djs = toJSON(dlist, pretty = FALSE, auto_unbox = TRUE, digits = 3)
   varname = "data" #strsplit(basename(csvf$f[i]), "\\.")[[1]][1]
   djs2 = paste0("export const ", varname, " = ","\n",djs,"\n",";")
-  outfn = paste0("basins_js/", tools::file_path_sans_ext(basename(csvf$f[i])), ".js")
+  outfn = paste0(basindir, "/", tools::file_path_sans_ext(basename(csvf$f[i])), ".js")
   write(djs2, file = outfn)
 }
 # pts_000023 too large (>100mb)?

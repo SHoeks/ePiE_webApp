@@ -304,7 +304,7 @@ export function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi
         ptsCopy.forEach(row => {
             const consumptionValue = consDict[row.rptMStateK] || 0;
             if (row.Pt_type === 'WWTP') {
-                row.E_in = (consumptionValue * (chem[chemIdx].f_uf || 0)) * (row.f_STP || 0);
+                row.E_in = (consumptionValue * (chem[chemIdx].f_uf || 0)) * (10**row.f_STP_log10 || 0);
             } else {
                 row.E_in = null;
             }
@@ -316,7 +316,7 @@ export function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi
             const metabValue = metabDict[row.rptMStateK] || 0;
             if (row.Pt_type === 'WWTP') {
                 row.E_in = (consumptionValue * (chem[chemIdx].f_uf || 0) + 
-                           metabValue * (chem[chemIdx].metab || 0)) * (row.f_STP || 0);
+                           metabValue * (chem[chemIdx].metab || 0)) * (10**row.f_STP_log10 || 0);
             } else {
                 row.E_in = null;
             }
@@ -338,7 +338,7 @@ export function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi
         // Use SimpleTreat4.0 model
         ptsCopy.forEach(row => {
             if (row.Pt_type === 'WWTP') {
-                if (row.f_STP === 0) {
+                if (10**row.f_STP_log10 === 0) {
                     row.f_rem_WWTP = 0;
                 } else {
                     const result = simpleTreat40(
@@ -997,8 +997,9 @@ export async function computeEnvConcentrationsV4Test(pts, HL, Progress_bar, CMD_
     const ptsPtType = ptsCopy.map(row => row.Pt_type);
     const ptsX = ptsCopy.map(row => parseFloat(row.x));
     const ptsY = ptsCopy.map(row => parseFloat(row.y));
-    const ptsFremWWTP = ptsCopy.map(row => parseFloat(row.f_rem_WWTP) || 0);
+    // const ptsFremWWTP = ptsCopy.map(row => parseFloat(row.f_rem_WWTP) || 0);
     const ptsRhoSd = ptsCopy.map(row => parseFloat(row.rho_sd) || 2.5);
+    // const rptMStateK = ptsCopy.map(row => row.rptMStateK || 0);
     
     let ptsHylakId, ptsLakeOut;
     if (HLEmpty) {
@@ -1209,8 +1210,9 @@ export async function computeEnvConcentrationsV4Test(pts, HL, Progress_bar, CMD_
         Q: ptsQ[i],
         Ew: ptsEw[i],
         C_w: ptsCw[i],
-        C_sd: ptsCsd[i],
-        WWTPremoval: ptsFremWWTP[i]
+        C_sd: ptsCsd[i]
+        // rptMStateK: rptMStateK[i],
+        // f_rem_WWTP: ptsFremWWTP[i]
     }));
     
     if (!HLEmpty) {

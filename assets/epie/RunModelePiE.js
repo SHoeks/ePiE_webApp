@@ -240,7 +240,12 @@ async function RunModelePiE(settings, basinData) {
     // // check local params
     // // ptsHl.pts[0]["ID"]
     // // ptsHl.pts[2]["k"]
-    // // console.log("ptsHl.pts: ", ptsHl.pts);
+    ////------------------------------------------------------------------------------
+    var idxSource_80 = ptsHl.pts.findIndex(obj => obj.ID === "Source_80");
+    console.log("ptsHl.pts idxSource_80: ", ptsHl.pts[idxSource_80]);
+    var idxSource_29 = ptsHl.pts.findIndex(obj => obj.ID === "Source_29");
+    console.log("ptsHl.pts idxSource_29: ", ptsHl.pts[idxSource_29]);
+    ////------------------------------------------------------------------------------
     CMD_out_obj.innerText += "\n";
     CMD_out_obj.scrollTop = CMD_out_obj.scrollHeight;
 

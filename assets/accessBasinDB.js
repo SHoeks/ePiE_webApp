@@ -93,7 +93,7 @@ function fillMissingFields(dataArray) {
         'dist_nxt': 'float', 'HL_ID_new': 'int', 'uwwID': 'str', 'rptMStateK': 'str', 
         'uwwCode': 'str', 'uwwName': 'str', 'uwwCollect': 'str', 'uwwLatit_1': 'str', 
         'uwwLongi_1': 'str', 'uwwLoadEnt': 'Int64', 'uwwCapacit': 'Int64', 
-        'uwwPrimary': 'Int64', 'uwwSeconda': 'Int64', 'f_STP': 'float', 
+        'uwwPrimary': 'Int64', 'uwwSeconda': 'Int64', 'f_STP_log10': 'float', 
         'F_direct': 'float', 'basin_id': 'str', 'LD_new': 'float', 'aggID': 'str',
         'uwwOtherTr': 'Int64', 'uwwNRemova': 'Int64', 'uwwPRemova': 'Int64', 
         'uwwUV': 'Int64', 'uwwChlorin': 'Int64', 'uwwOzonati': 'Int64', 
@@ -102,6 +102,22 @@ function fillMissingFields(dataArray) {
         'aggLongi_1': 'str', 'aggGenerat': 'str', 'snap_dist': 'float', 'stop': 'Int64', 
         'Freq': 'Int64', 'flow_acc': 'float', 'pH': 'float'
     };
+    // const schema = {
+    //     'ID': 'str', 'x': 'float', 'y': 'float', 'ID_nxt': 'str', 'Down_type': 'str', 
+    //     'T_AIR': 'float', 'Wind': 'float', 'line_node': 'str', 'lake_out': 'int', 
+    //     'lake_in': 'int', 'slope': 'float', 'Pt_type': 'str', 'Dist_down': 'float', 
+    //     'dist_nxt': 'float', 'HL_ID_new': 'int', 'uwwID': 'str', 'rptMStateK': 'str', 
+    //     'uwwCode': 'str', 'uwwName': 'str', 'uwwCollect': 'str', 'uwwLatit_1': 'str', 
+    //     'uwwLongi_1': 'str', 'uwwLoadEnt': 'Int64', 'uwwCapacit': 'Int64', 
+    //     'uwwPrimary': 'Int64', 'uwwSeconda': 'Int64', 'f_STP': 'float', 
+    //     'F_direct': 'float', 'basin_id': 'str', 'LD_new': 'float', 'aggID': 'str',
+    //     'uwwOtherTr': 'Int64', 'uwwNRemova': 'Int64', 'uwwPRemova': 'Int64', 
+    //     'uwwUV': 'Int64', 'uwwChlorin': 'Int64', 'uwwOzonati': 'Int64', 
+    //     'uwwSandFil': 'Int64', 'uwwMicroFi': 'Int64', 'uwwOther': 'Int64', 
+    //     'uwwSpecifi': 'str', 'aggCode': 'str', 'aggName': 'str', 'aggLatit_1': 'str', 
+    //     'aggLongi_1': 'str', 'aggGenerat': 'str', 'snap_dist': 'float', 'stop': 'Int64', 
+    //     'Freq': 'Int64', 'flow_acc': 'float', 'pH': 'float'
+    // };
 
     return dataArray.map(row => {
         for (const [key, type] of Object.entries(schema)) {

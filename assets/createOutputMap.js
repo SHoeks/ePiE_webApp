@@ -9,6 +9,28 @@ function createOutputMap() {
   console.log("createOutputMap")
 
   // define color ramp
+  // const gradientArray = [ "#3f2caf",
+  //                         "#503cab",
+  //                         "#624ba7",
+  //                         "#735ba3",
+  //                         "#856b9f",
+  //                         "#967a9c",
+  //                         "#a78a98",
+  //                         "#b99a94",
+  //                         "#caaa90",
+  //                         "#dcb98c",
+  //                         "#edbd85",
+  //                         "#ecb183",
+  //                         "#eca580",
+  //                         "#ec997d",
+  //                         "#eb8d7a",
+  //                         "#eb8078",
+  //                         "#ea7475",
+  //                         "#ea6872",
+  //                         "#ea5c6f",
+  //                         "#e9506d" ];
+  
+  // similar gradiet but more intese red
   const gradientArray = [ "#3f2caf",
                           "#503cab",
                           "#624ba7",
@@ -19,16 +41,18 @@ function createOutputMap() {
                           "#b99a94",
                           "#caaa90",
                           "#dcb98c",
-                          "#edbd85",
-                          "#ecb183",
-                          "#eca580",
-                          "#ec997d",
-                          "#eb8d7a",
-                          "#eb8078",
-                          "#ea7475",
-                          "#ea6872",
-                          "#ea5c6f",
-                          "#e9506d" ];
+                          "#ed9e76",
+                          "#ed8c65",
+                          "#ed7a54",
+                          "#ec6843",
+                          "#ec572f",
+                          "#eb451c",
+                          "#eb3409",
+                          "#ea2200",
+                          "#ea1100",
+                          "#e90000" ];
+
+  
   var varNcolorsCheck = gradientArray.length;
 
   console.log("createOutputMap")
@@ -96,7 +120,7 @@ function createOutputMap() {
     if(pts[i].C_w === null || pts[i].C_w === 0){
       continue;
     }
-    tmp = Math.log10(pts[i].C_w);
+    tmp = Math.log10(pts[i].C_w * 1000); // convert from ug/L to ng/L
     if (tmp < logCwmin) logCwmin = tmp;
     if (tmp > logCwmax) logCwmax = tmp;
   }
@@ -116,7 +140,7 @@ function createOutputMap() {
     if(pts[i].C_w === null || pts[i].C_w === 0){
       pts[i].Color = gradientArray[0];//"#909090";
     }else{
-      ColorIdxs = Math.floor((Math.log10(pts[i].C_w) - logCwmin) / ColorStepsLog10);
+      ColorIdxs = Math.floor((Math.log10(pts[i].C_w * 1000) - logCwmin) / ColorStepsLog10);
       pts[i].Color = gradientArray[ColorIdxs];
     }
   }
@@ -135,17 +159,17 @@ function createOutputMap() {
   var map = L.map('map').setView([center_y, center_x], 6);
   var myRenderer = L.canvas({ padding: 0.5 });
 
-  // //L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',{maxZoom:10}).addTo(map);
-  // if(isDevelopment){
-  //   L.tileLayer(appRootDir+'/resources/tiles/{z}/{x}/{y}.png',{maxZoom:8, minZoom: 4,opacity: 0.5}).addTo(map);
-  // }else{
-  //   L.tileLayer(appRootDir+'/tiles/{z}/{x}/{y}.png',{maxZoom:8, minZoom: 4,opacity: 0.5}).addTo(map);
-  // }
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer.wms('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
+    attribution: '&copy; OpenStreetMap contributors',
+    opacity: 0.6
   }).addTo(map)
+
+  // var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+  //   attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+  //   maxZoom: 19
+  // }).addTo(map);
+
 
   const pts2 = pts.map(pt => {
     return {
@@ -155,14 +179,18 @@ function createOutputMap() {
         "coordinates": [pt.x, pt.y]
       },
       "properties": {
-        "C_w": pt.C_w,
+        "C_w": pt.C_w * 1000 , // convert from ug/L to ng/L
+        "Ew": pt.Ew,
+        // "f_rem_WWTP": pt.f_rem_WWTP,
+        // "rptMStateK": pt.rptMStateK,
+        "ID": pt.ID,
         "Pt_type": pt.Pt_type,
         "Color": pt.Color
       }
     };
   });
 
-  console.log(pts2[10]);
+  // console.log(pts2[10]);
 
   var geoJson = new L.geoJSON(pts2, {
       pointToLayer: (feature) => {
@@ -177,16 +205,11 @@ function createOutputMap() {
           });
       },
       onEachFeature: function (feature, layer) {
-          // layer.bindPopup(
-          //   '<p> ug/L: '+ feature.properties.C_w + 
-          //   '<br> Pt_type: ' + feature.properties.Pt_type + 
-          //   '</p>'
-          // );
           layer.bindPopup( 
-            '<p> ug/L: '+ feature.properties.C_w + 
+            '<p> ng/L: '+ feature.properties.C_w + 
+            '<br> ID: ' + feature.properties.ID +
             '<br> Pt_type: ' + feature.properties.Pt_type + 
-            '<br> WWTPremoval: ' + feature.properties.WWTPremoval + 
-            '<br> ptsFremWWTP: ' + feature.properties.ptsFremWWTP + 
+            // '<br> Ew: ' + feature.properties.Ew + 
             '</p>'
           );
       }
@@ -201,7 +224,7 @@ function createOutputMap() {
     var div = L.DomUtil.create("div", "legend");
     div.id = "outputmaplegend";
     div.innerHTML += "<h4 style='margin: 2px 0px;'>Legend</h4>";
-    div.innerHTML += "<h5 style='font-size:0.8rem;margin: 5px 0px;'>Log10 concentration ug/L</h5>";
+    div.innerHTML += "<h5 style='font-size:0.8rem;margin: 5px 0px;'>Log10 concentration ng/L</h5>";
 
     let colors = [];
     let values = [];

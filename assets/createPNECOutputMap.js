@@ -36,7 +36,7 @@ function createPNECOutputMap( ) {
   // stop if pnec is NaN    
   if (isNaN(pnec)) {
     console.log('pnec is NaN!');
-    alert('Unable to generate map, PNEC value is not valid. Please enter a valid PNEC value.');
+    alert('Unable to generate map, risk threshold is not valid. Please enter a valid risk threshold.');
     return;
   }
 
@@ -87,7 +87,7 @@ function createPNECOutputMap( ) {
       continue;
     }
     // tmp = Math.log10(pts.features[i].properties.C_w / pnec );
-    tmp = pts[i].C_w / pnec;
+    tmp = (pts[i].C_w*1000) / pnec;
     if (tmp < logCwmin) logCwmin = tmp;
     if (tmp > logCwmax) logCwmax = tmp;
   }
@@ -107,7 +107,7 @@ function createPNECOutputMap( ) {
     if(pts[i].C_w === null || pts[i].C_w === 0){
       pts[i].Color = "#888888";
     }else{
-      ratio = (pts[i].C_w / pnec);
+      ratio = (pts[i].C_w*1000) / pnec;
       if(ratio>10) pts[i].Color = colorsDiver[0];
       if(ratio>1 & ratio<=10) pts[i].Color = colorsDiver[1];
       if(ratio<=1 & ratio>0.1) pts[i].Color = colorsDiver[2];
@@ -135,17 +135,17 @@ function createPNECOutputMap( ) {
   var map = L.map('pnec_map').setView([center_y, center_x], 6);
   var myRenderer = L.canvas({ padding: 0.5 });
 
-  // //L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',{maxZoom:10}).addTo(map);
-  // if(isDevelopment){
-  //   L.tileLayer(appRootDir+'/resources/tiles/{z}/{x}/{y}.png',{maxZoom:8, minZoom: 4,opacity: 0.5}).addTo(map);
-  // }else{
-  //   L.tileLayer(appRootDir+'/tiles/{z}/{x}/{y}.png',{maxZoom:8, minZoom: 4,opacity: 0.5}).addTo(map);
-  // }
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer.wms('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
+    attribution: '&copy; OpenStreetMap contributors',
+    opacity: 0.6
   }).addTo(map)
+
+  // var Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+  //   attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+  //   maxZoom: 19
+  // }).addTo(map);
+
 
   const pts2 = pts.map(pt => {
     return {
@@ -155,7 +155,7 @@ function createPNECOutputMap( ) {
         "coordinates": [pt.x, pt.y]
       },
       "properties": {
-        "C_w": pt.C_w,
+        "C_w": pt.C_w * 1000,
         "Pt_type": pt.Pt_type,
         "Color": pt.Color,
         "Alpha": pt.Alpha
@@ -180,7 +180,7 @@ function createPNECOutputMap( ) {
       },
       onEachFeature: function (feature, layer) {
           // layer.bindPopup('<p> ug/L: '+ feature.properties.C_w + ' ' + Math.log10(feature.properties.C_w));
-          layer.bindPopup('<p> ug/L: '+ feature.properties.C_w);
+          layer.bindPopup('<p> ng/L: '+ feature.properties.C_w);
       }
   });
 

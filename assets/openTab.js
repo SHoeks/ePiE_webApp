@@ -17,6 +17,7 @@ function openTabWrapper(evt, tabName) {
   if(tabName=="Basin_result_stats") titleObj.innerHTML = "Output statistics";
   if(tabName=="PNEC_Map_results") titleObj.innerHTML = "Map risks";
   if(tabName=="full_settings") titleObj.innerHTML = "View Settings";
+  if(tabName=="Risk_result_stats") titleObj.innerHTML = "Risk statistics";
 
   // open tab if it is not locked
   if (!lockedTabs[tabName]) {

@@ -38,7 +38,7 @@
       var APIExcelTemplateFullPath = "./data/model_inputs/API_template.xlsx";
 
       // base path of hydrological data (end with "/"!)
-      var baseHydroDataPath = "../data/resources/basins_js/";
+      var baseHydroDataPath = "../data/resources/basins_js2/";
 
       // global vars holding big pts, hl and flow data
       var global_pts_data = null;
@@ -74,6 +74,9 @@
     <script src="assets/createOutputMap.js"></script>
     <script src="assets/createPNECOutputMap.js"></script>
     <script src="assets/calculateBasinStatistics.js"></script>
+    <script src="assets/calculateRiskStatistics.js"></script>
+    <script src="assets/setAllPNECvals.js"></script>
+    <script src="assets/saveStatsToExcel.js"></script>
     
     <!-- epie -->
     <script type="module" src="assets/epie/RunModelePiE.js"></script>
@@ -81,7 +84,7 @@
     <!-- local epie data -->
     <script src="data/basin_geo/Basin.js"></script>
     <script src="data/model_inputs/example_chem.js"></script>
-    <script src="data/resources/basins_js/BasinIndex.js"></script>
+    <script src="data/resources/basins_js2/BasinIndex.js"></script>
 
 
     <!-- new UI reformatting style -->
@@ -300,6 +303,7 @@
     <button id="tablink_Map_results" class="tablinks" onclick="openTabWrapper(event, 'Map_results')">Map results</button>
     <button id="tablink_Basin_result_stats" class="tablinks" onclick="openTabWrapper(event, 'Basin_result_stats')">Output statistics</button>
     <button id="tablink_PNEC_Map_results" class="tablinks" onclick="openTabWrapper(event, 'PNEC_Map_results')">Map risks</button>
+    <button id="tablink_Risk_result_stats" class="tablinks" onclick="openTabWrapper(event, 'Risk_result_stats')">Risk statistics</button>
     <button id="tablink_full_settings" class="tablinks" onclick="openTabWrapper(event, 'full_settings')">View Settings</button>
     </nav>
   </div>
@@ -1007,8 +1011,8 @@
       <!-- <p>tabcontent.</p> -->
       <label style="width: 10px;"> </label>
       <label style="margin-right: 4px;" for="API_map_selection">Risk threshold value: </label>
-      <input style="width: 150px;" class="riskvalclass" type="text" id="riskval" value="0.01" />
-      <label style="margin-right: 4px;" for="API_map_selection">ug/L </label>
+      <input style="width: 150px;" class="riskvalclass" type="text" id="riskval" value="1.00" onchange="setAllPNECvals(0)" />
+      <label style="margin-right: 4px;" for="API_map_selection">ng/L </label>
       <button class="action_button" style="margin-left: 10px;" type="button"
         onclick="createPNECOutputMap()">Generate map</button>
       <div id="osm_map"></div>
@@ -1036,50 +1040,52 @@
     <option value="API1">Ibuprofen4</option> -->
     </select>
     <!-- <p>tabcontent.</p> -->
-    <button class="action_button" style="margin-left: 0px;" type="button"
-      onclick="CalculateBasinStatistics()">Calculate statistics</button>
+    <button class="action_button" style="margin-left: 0px;" type="button" onclick="CalculateBasinStatistics()">Calculate statistics</button>
+    <button class="action_button" style="margin-left: 3px;" type="button" onclick="saveStatsToExcel()">Export statistics to Excel</button>
 
     <div>
-      <form class="API_table_form" style="max-width: 1150px;">
-        <table id="API_table_basinStats" cellspacing="0" cellpadding="4">
-          <tbody>
-            <tr>
-              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span
-                  class="firstSpan">API<br>(ID)<br><span class="secondSpan">Explanation1</span></span> </th>
-              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span
-                  class="firstSpan">Basin<br>(ID)<br><span class="secondSpan">Explanation1</span></span> </th>
-              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Mean
-                  ug/L<br>(all)<br><span class="secondSpan">Explanation3</span></span> </th>
-              <th style="width: 150px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Median
-                  ug/L<br>(all)<br><span class="secondSpan">Explanation4</span></span> </th>
-              <th style="width: 200px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Mean
-                  ug/L<br>(downstream WWTP)<br><span class="secondSpan">Explanation5</span></span> </th>
-              <th style="width: 200px;" class="basinStats tableHeaderStats"> <span class="firstSpan">Median
-                  ug/L<br>(downstream WWTP)<br><span class="secondSpan">Explanation6</span></span> </th>
-            </tr>
-            <tr>
-              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
-              </td>
-              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
-              </td>
-              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
-              </td>
-              <td><input style="width: 150px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
-              </td>
-              <td><input style="width: 200px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
-              </td>
-              <td><input style="width: 200px;" class="tableHeaderStats" type="text" id="statcol" value="" readonly />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <form class="API_table_form" style="max-width: 1340px;">
+        <table id="API_table_basinStats" cellspacing="0" cellpadding="4"><tbody></tbody></table>
       </form>
     </div>
     </div>
 
     <!-- <div style="height: 45px;"></div> -->
-    <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="xxx()">Export statistics</button> -->
+    <!-- <button class="action_button" style="margin-left: 10px;" type="button" onclick="saveStatsToExcel()">Export statistics</button> -->
   </div></div>
+
+
+  <div id="Risk_result_stats" class="tabcontent"><div class="grid">
+    
+    <div class="card" style="grid-column: span 2;">
+    <!-- <h3>Output Statistics</h3> -->
+    <p>
+      Here the estimated environmental risks can summerized based on the estimated river concentrations and risk threshold. Enter the desired risk threshold and click the button 'Calculate risk statistics' to populate the
+      table.
+    </p>
+    <label style="width: 10px;"> </label>
+    <label style="margin-right: 4px;" for="API_map_selection">Risk threshold value: </label>
+    <input style="width: 150px;" class="riskvalclass" type="text" id="riskval" value="1.00" onchange="setAllPNECvals(1)" />
+    <label style="margin-right: 4px;" for="API_map_selection">ng/L </label>
+    <label style="margin-right: 4px;" for="API_map_selection" class="results_stats_select">Calculate statistics for: </label>
+    <select name="API_map_selection" id="API_map_selection" class="results_stats_select">
+      <option value="API1">No results yet</option>
+    </select>
+    <!-- <p>tabcontent.</p> -->
+    <button class="action_button" style="margin-left: 0px;" type="button" onclick="CalculateRiskStatistics()">Calculate risk statistics</button>
+    <button class="action_button" style="margin-left: 3px;" type="button" onclick="saveStatsToExcel()">Export statistics to Excel</button>
+
+    <div>
+      <form class="API_table_form" style="max-width: 1340px;">
+        <table id="API_table_RiskStats" cellspacing="0" cellpadding="4"><tbody></tbody></table>
+      </form>
+    </div>
+
+    </div>
+
+  </div></div>
+
+
 
   <div id="full_settings" class="tabcontent"><div class="grid">
     
@@ -1112,7 +1118,7 @@
       <pre id="consumptionDataFull">{Undefined}</pre>
     </div>
 
-    <div class="card" style="grid-column: span 2;">
+    <div class="card" style="grid-column: span 2; display: none;">
       <h3>Test buttons</h3>
       <!-- buttons for testing functions -->
       <div style="height: 10px;"></div>
@@ -1139,7 +1145,7 @@
 
     // test for loading basin data later on request
     function loadBigData() {
-      import('./data/resources/basins_js/BasinIndex.js').then(({ BasinIndex }) => {
+      import('./data/resources/basins_js2/BasinIndex.js').then(({ BasinIndex }) => {
         console.log('Loaded big data:', BasinIndex);
       });
     }
