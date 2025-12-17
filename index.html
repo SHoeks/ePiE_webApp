@@ -416,7 +416,7 @@
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
       </div>
 
-      <form class="API_table_form" id="form_table1_chem">
+      <form class="API_table_form" id="form_table1_chem" style="overflow-x: auto;">
         <table id="API_table" cellspacing="0" cellpadding="4">
           <tbody>
             <tr>
@@ -492,7 +492,7 @@
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
       </div>
 
-      <form class="API_table_form" id="form_table2_chem">
+      <form class="API_table_form" id="form_table2_chem" style="overflow-x: auto;">
         <table id="API_table2" cellspacing="0" cellpadding="4">
           <tbody>
             <tr>
@@ -551,7 +551,7 @@
         </table>
       </form>
     
-      <form class="API_table_form" id="form_table2alt_chem">
+      <form class="API_table_form" id="form_table2alt_chem" style="overflow-x: auto;">
         <table id="API_table2alt" cellspacing="0" cellpadding="4">
           <tbody>
             <tr>
@@ -681,9 +681,10 @@
       <p style="max-width: 1250px;">ePiE has the option to make predictions for the longterm yearly average flow, minimum
         and maximum flow conditions for the years 2000-2015.
         The default option is average yearly flow. Use the drop-down menu below to change the flow conditions.</p>
-      <div id="prnt_slct_flow_div" style="display: flex; justify-content: left;">
+      <div id="prnt_slct_flow_div" style="display: flex; justify-content: left; margin-top: 10px; padding-top: 10px;">
+        <p style="margin-top: 0px;">Set flow condition: </p>
         <form style="margin-top: -5px;">
-          <label for="flow">Set flow condition: </label>
+          <label for="flow"></label>
           <select onchange="getFlowSelection()" name="flow" id="flow">
             <option value="Average">Average yearly flow</option>
             <option value="Min">Minimum yearly flow</option>
@@ -691,8 +692,8 @@
           </select>
           <!-- <button type="button" style="margin-left: 10px;" class="action_button" onclick="getFlowSelection()">Confirm</button> -->
         </form>
-        <p>Selected flow: </p>
-        <p id="prnt_slct_flow">Average</p>
+        <p style="margin-top: 0px;">Selected flow: </p>
+        <p id="prnt_slct_flow" style="font-weight: 300;">Average</p>
       </div>
     </div>
 
@@ -755,7 +756,7 @@
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
       </div>
     
-      <form class="API_table_form" style="max-width: 800px;">
+      <form class="API_table_form" style="max-width: 800px; overflow-x: auto;">
         <table id="API_table_degradation" cellspacing="0" cellpadding="4">
           <tbody>
             <tr>
@@ -800,7 +801,7 @@
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
       </div>
 
-      <form class="API_table_form" style="max-width: 1200px;">
+      <form class="API_table_form" style="max-width: 1200px; overflow-x: auto;">
         <table id="API_table_degradation2" cellspacing="0" cellpadding="4">
           <tbody>
             <tr>
@@ -890,7 +891,7 @@
       <!-- <button class="action_button" type="button" style="margin-bottom: 0rem;" onclick="notYetDeveloped()">Read Excel data</button> -->
     </div>
 
-    <form class="API_table_form" id="avg_per_capita_cons_table" style="max-width: 800px;">
+    <form class="API_table_form" id="avg_per_capita_cons_table" style="max-width: 800px;overflow-x: auto;">
       <table id="API_table_consumption_avg_per_capita" cellspacing="0" cellpadding="4">
         <tbody>
         </tbody>
@@ -900,7 +901,7 @@
     <div id="progress_gen_table_cons">Generating consumption table, please wait...</div>
 
     <div id="div_container_pop_year">
-      <form style="margin-top: 0px;">
+      <form style="margin-top: 0px; overflow-x: auto;">
         <label for="pop_year">Select population year</label>
         <select onchange="setPopulationYear()" name="pop_year" id="pop_year" selected="select from drop-down menu">
           <option value=2024>2024</option>
@@ -919,7 +920,7 @@
       <div style="display: none;" id="pop_year_value_holder">2024</div>
     </div>
 
-    <form class="API_table_form" style="max-width: 800px;">
+    <form class="API_table_form" style="max-width: 800px; overflow-x: auto;">
       <table id="API_table_consumption" cellspacing="0" cellpadding="4">
         <tbody>
         </tbody>
@@ -1041,10 +1042,10 @@
     </select>
     <!-- <p>tabcontent.</p> -->
     <button class="action_button" style="margin-left: 0px;" type="button" onclick="CalculateBasinStatistics()">Calculate statistics</button>
-    <button class="action_button" style="margin-left: 3px;" type="button" onclick="saveStatsToExcel()">Export statistics to Excel</button>
+    <button class="action_button" style="margin-left: 0px;" type="button" onclick="saveStatsToExcel()">Export statistics to Excel</button>
 
     <div>
-      <form class="API_table_form" style="max-width: 1340px;">
+      <form class="API_table_form" style="max-width: 1340px; overflow-x: auto;">
         <table id="API_table_basinStats" cellspacing="0" cellpadding="4"><tbody></tbody></table>
       </form>
     </div>
@@ -1073,10 +1074,10 @@
     </select>
     <!-- <p>tabcontent.</p> -->
     <button class="action_button" style="margin-left: 0px;" type="button" onclick="CalculateRiskStatistics()">Calculate risk statistics</button>
-    <button class="action_button" style="margin-left: 3px;" type="button" onclick="saveStatsToExcel()">Export statistics to Excel</button>
+    <button class="action_button" style="margin-left: 0px;" type="button" onclick="saveStatsToExcel()">Export statistics to Excel</button>
 
     <div>
-      <form class="API_table_form" style="max-width: 1340px;">
+      <form class="API_table_form" style="max-width: 1340px; overflow-x: auto;">
         <table id="API_table_RiskStats" cellspacing="0" cellpadding="4"><tbody></tbody></table>
       </form>
     </div>
