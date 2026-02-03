@@ -284,12 +284,78 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
+
+    /* disclaimer + acknowledgments banner */
+    .disclaimer_grid {
+      background-color: #ebf6dd; padding: 10px;max-width: 1360px; overflow: hidden; 
+      border-radius: 12px; display: grid;grid-template-columns: 1fr 1fr 1fr 1fr 5fr; gap: 5px;
+    }
+    .disclaimer_logo {
+      background-color: #00000000;text-align: center;padding: 10px;font-size: 1px;
+    }
+    .disclaimer_txt {
+      background-color: #00000000;text-align: left;padding: 2px;font-size: 11px;
+    }
+
+    @media (max-width: 1400px) {
+      .disclaimer_txt {
+        background-color: #00000000;text-align: left;padding: 3px;font-size: 10px;
+      }
+      .disclaimer_grid {
+        gap: 3px;
+      }
+    }
+
+    /* if screenwidth < 1200px */
+    @media (max-width: 1200px) {
+      .disclaimer_grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+      .disclaimer_txt {
+        background-color: #00000000;text-align: center;padding: 10px;font-size: 10px; grid-column-start: 1;grid-column-end: 5;
+      }
+    }
+
+    /* mobileWarning */
+    #mobileWarning{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #ffffff;
+      border: 2px solid #ff0000;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      z-index: 1000;
+      width: 80%;
+      max-width: 400px;
+      display: none;
+    }
+
+    /* if screenwidth < 900px */
+    @media (max-width: 900px) {
+      #mobileWarning{
+        display: block;
+      }
+      .main, .sidebar {
+        opacity: 0.1;
+      }
+    }
+
+
+
     </style>
-  
 
   </head>
 <body>
 
+  <div id="mobileWarning">
+    <h2>Warning: ePiE is not optimized for mobile devices or small screens</h2>
+    <p>Please use a desktop or laptop computer to access the full functionality of the ePiE application.</p>
+    <p>We apologize for any inconvenience.</p>
+  </div>
 
   <div class="sidebar">
     <h1>ePiE</h1>
@@ -335,13 +401,16 @@
         defining the API properties there are two options:</p>
       <!-- <p><b>Contact details:</b> selwyn.hoeks@ru.nl</p> -->
       <ul>
-        <li>You can make use of a pre-defined list of APIs for which the model is already parametrized (see <a
-            href="https://pubs.acs.org/doi/10.1021/acs.est.8b03862" target="_blank">Oldenkamp et al. 2018</a>)</li>
-        <li>You can parametrize the model yourself for new APIs by providing the required data entries. </li>
+        <li style="margin-top: 8px">You can make use of a pre-defined list of APIs for which the model is already parametrized (used by <a
+            href="https://pubs.acs.org/doi/10.1021/acs.est.8b03862" target="_blank">Oldenkamp et al. 2018</a>). 
+            This can be done by downloading the template using the "Get Excel template" button on the API properties tab.</li>
+        <li style="margin-top: 8px">The ePiE model can be parameterized by for new APIs by providing the required data entries. </li>
       </ul>
-      <p style="margin-bottom:0px;">A comprehensive manual can be found here: <a
+      <p style="margin-bottom:0px;display:none;">
+        A comprehensive manual can be found here: <a
           href="https://shoeks.github.io/static_html/workinprogress.html" target="_blank">manual</a></p>
-      <p>More details about the model equations can be found here: <a
+      <p style="display:none;">
+        More details about the model equations can be found here: <a
           href="https://pubs.acs.org/doi/abs/10.1021/acs.est.8b03862" target="_blank">technical details</a></p>
     </div>
 
@@ -356,6 +425,29 @@
     <div class="card" style="grid-column: span 2;">
       <h3>Questions & support</h3>
       <p>For any questions, please contact Selwyn Hoeks via email: <a href="mailto:selwyn.hoeks@ru.nl">selwyn.hoeks@ru.nl</a>.</p>
+    </div>
+
+    <div class="card" style="grid-column: span 2;">
+      <h3>Acknowledgement & disclaimer</h3>
+      <div class="disclaimer_grid">
+        <div class="disclaimer_logo">
+          <img src="assets/disclaimer_banner/RU_logo_NL.png" alt="RADBOUD" style="max-height: 40px;" />
+        </div>
+        <div class="disclaimer_logo">
+          <img src="assets/disclaimer_banner/IMILogo2014-HorizPos.png" alt="IMI" style="max-height: 40px;" />
+        </div>
+        <div class="disclaimer_logo">
+          <img src="assets/disclaimer_banner/Efpia_Logo.png" alt="EFPIA" style="max-height: 40px;" />
+        </div>
+        <div class="disclaimer_logo">
+          <img src="assets/disclaimer_banner/Flag_of_Europe.png" alt="Europe" style="max-height: 40px;" />
+        </div>
+        <div class="disclaimer_txt">
+          This project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking (JU) under grant agreement No 875508. 
+          The JU receives support from the European Union's Horizon 2020 research and innovation programme and EFPIA.
+          Disclaimer: This presentation reflects only the author's view, and the JU is not responsible for any use that may be made of the information it contains herein.
+        </div>
+      </div>  
     </div>
 
   </div></div>
