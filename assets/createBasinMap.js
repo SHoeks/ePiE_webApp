@@ -191,9 +191,17 @@ function createBasinMap(selected_basins,selected_basins_names){
 
 function setBasinSelectSettings(selected_basins,selected_basins_names){
 
+  // set selected basins in settings
   var htmlbasinselectdata = document.getElementById('selectedBasinsDataFull'); 
   var basin_js_obj = {selected_basins: selected_basins, selected_basins_names: selected_basins_names};
   htmlbasinselectdata.textContent = JSON.stringify(basin_js_obj, null, 2);
+
+  // set flow to settings
+  var selected_flow = {};
+  selected_flow.flow_condition = document.querySelector("#flow").value;
+  var htmlflowselectdata = document.getElementById('selectedFlowDataFull'); 
+  htmlflowselectdata.textContent = JSON.stringify(selected_flow, null, 2);
+
 
 }
 

@@ -125,9 +125,9 @@ setSettingsFromFile = function() {
 }
 
 
-setExampleSettings = function() {
+setExampleSettings = function(file_path) {
     // set example chemical data
-    fetch('example_settings.json')
+    fetch(file_path)
     .then(response => response.json())
     .then(data => {
         console.log("Example settings loaded: ", data);
@@ -137,22 +137,30 @@ setExampleSettings = function() {
         document.getElementById('consumptionDataFull').textContent = JSON.stringify(data.consumptionData, null, 2);
         document.getElementById('selectedFlowDataFull').textContent = JSON.stringify(data.flowSelection, null, 2);
         // alert("Example settings successfully loaded.");
-        
+   
         // set selected basins
-        selected_basins = data.basinIDs.selected_basins;
-        selected_basins_names = data.basinIDs.selected_basins_names;
+        if(data.basinIDs){
+            selected_basins = data.basinIDs.selected_basins;
+            selected_basins_names = data.basinIDs.selected_basins_names;
+        }else{
+            console.log('setExampleSettings, no basins selected in example settings.');
+        }
 
         // update WWTP removal data in UI
-        let pf = data.wwtpRemovalData.custom_wwtp_primary_removal;
-        let sf = data.wwtpRemovalData.custom_wwtp_secondary_removal;
-        let div1 = document.getElementById("primaryFrac_row1");
-        let div2 = document.getElementById("secondaryFrac_row1");
-        div1.value = pf;
-        div2.value = sf;
-        div1.setAttribute('value',pf); 
-        div2.setAttribute('value',sf); 
-        div1.style.color = "#000000ff";
-        div2.style.color = "#000000ff";
+        if(data.wwtpRemovalData){
+            let pf = data.wwtpRemovalData.custom_wwtp_primary_removal;
+            let sf = data.wwtpRemovalData.custom_wwtp_secondary_removal;
+            let div1 = document.getElementById("primaryFrac_row1");
+            let div2 = document.getElementById("secondaryFrac_row1");
+            div1.value = pf;
+            div2.value = sf;
+            div1.setAttribute('value',pf); 
+            div2.setAttribute('value',sf); 
+            div1.style.color = "#000000ff";
+            div2.style.color = "#000000ff";
+        }else{
+            console.log('setExampleSettings, no WWTP removal data provided in example settings.');
+        }
 
     })
     .catch(error => {

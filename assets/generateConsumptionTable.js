@@ -1,5 +1,30 @@
 async function generateConsumptionTableWrapper(){
 
+    let basins = document.querySelector("#selectedBasinsDataFull");
+
+    // check if there are any basins selected, if not trow alert and return
+    if(basins.textContent === "{Undefined}" || basins.textContent === "" || basins.textContent === null){
+        console.log("No basins selected, cannot set consumption settings.");
+        alert("No basins selected, please select the basins of interest to set the consumption settings.");
+        output.textContent = "{Undefined}";
+        return; // No basins selected or error occurred
+    }
+
+    if(!basins.textContent.includes("selected_basins")){
+        console.log("No basins selected, cannot set consumption settings.");
+        alert("No basins selected, please select the basins of interest to set the consumption settings.");
+        output.textContent = "{Undefined}";
+        return; // No basins selected or error occurred
+    }
+
+    let tmpbasinIDs = JSON.parse(basins.textContent).selected_basins;
+    if(tmpbasinIDs.length === 0){
+        console.log("No basins selected, cannot set consumption settings.");
+        alert("No basins selected, please select the basins of interest to set the consumption settings.");
+        output.textContent = "{Undefined}";
+        return; // No basins selected or error occurred
+    }
+
     // show progress
     let btn_obj = document.getElementById("gen_cons_table_btn")
     btn_obj.style.color = "#ffffff"
@@ -8,15 +33,23 @@ async function generateConsumptionTableWrapper(){
 
 
     // check if current cons table is empty or not 
-    let tableempty = document.querySelector("#API_table_consumption").innerHTML === "<tbody></tbody>"
-    if(!tableempty) console.log("Table not empty");
+    // check if table contains tr elements (rows) other than header
+    let tableempty = true;
+    let table_rows = document.querySelectorAll("#API_table_consumption tbody tr");
+    let table_has_rows = table_rows.length > 0;
+    if(table_has_rows) {
+        console.log("Table not empty");
+        tableempty = false;
+    }else{
+        console.log("Table empty");
+    }
 
     // document.querySelector("#progress_gen_table_cons").style.display = "inline-block";
     
     // Get file maps and basin mappings
     const {unique_pts_files,unique_hl_files,unique_flow_files,pts_basin_map,hl_basin_map,flow_basin_map} = getFileMaps();
 
-        // reset progress indicators
+    // reset progress indicators
     if(unique_pts_files.length === 0){
         console.log("No basins selected");
         alert("No basins selected, please select at least one basin to generate the consumption data table");
@@ -320,7 +353,20 @@ setConsumptionToSettings = function(){
         }else{
             // settings are loaded from file, keep those instead
             let storeConsData = output.textContent;
-            let consData = JSON.parse(storeConsData);
+
+            // try to parse the stored settings, if error set output to undefined and return
+            let consData = {};
+            try {
+                consData = JSON.parse(storeConsData);
+            }catch (error) {
+                console.log("no cons stored in settings, cannot parse settings, setting to undefined");
+            }
+
+            if(Object.keys(consData).length === 0){
+                console.log("no cons stored in settings, setting to undefined");
+                output.textContent = "{Undefined}";
+                return;
+            }
             
             // copy values from loaded settings to table
             for(let i=1; i < consCntTableRows.length; i++){ // skip header row
