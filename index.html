@@ -120,6 +120,7 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
+      opacity: 0.1; /* start with low opacity, will be set to 1 after disclaimer is accepted */
     }
     .sidebar h1 {
       margin: 0;
@@ -183,6 +184,7 @@
       padding: 24px;
       overflow: auto;
       overflow-x: hidden;
+      opacity: 0.1; /* start with low opacity, will be set to 1 after disclaimer is accepted */
     }
 
     .page-title {
@@ -274,7 +276,7 @@
     }
     @keyframes slideInLeft {
       from { transform: translateX(-30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(0); opacity: 0.1; }
     }
 
     .main {
@@ -282,7 +284,7 @@
     }
     @keyframes slideInUp {
       from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(0); opacity: 0.1; }
     }
 
 
@@ -362,6 +364,30 @@
     <h2>Warning: ePiE is not optimized for mobile devices or small screens</h2>
     <p>Please use a desktop or laptop computer to access the full functionality of the ePiE application.</p>
     <p>We apologize for any inconvenience.</p>
+  </div>
+
+  <div id="disclaimerWarning">
+    <h2>Legal disclaimer</h2>
+    <p>By accessing or using the ePiE web application, including the data contained therein, you agree to the terms of this Disclaimer. If you do not agree, you must not use the ePiE web application.</p>
+    
+    <p>This web application is continuously in development and subject to change. It is maintained and controlled by the Department of Environmental Science from Radboud University in The Netherlands. The application was developed within the context of the IMI2 PREMIER project. Access to the application is being provided in furtherance of the IMI2 PREMIER objectives.</p>
+
+    <p>Use of the web application is at your own risk. The web application is provided "as is" without warranty of any kind, express or implied. Neither Radboud University nor any of the IMI2 PREMIER CONSORTIUM members accept any responsibility or liability whatsoever (including, but not limited to, any direct or consequential loss or damage) arising from or in connection with the access to and use of the web application, or the quality, accuracy and/or the completeness of the data contained in the web application.</p>
+
+    <p>Use of the ePiE web application is not permitted for commercial purposes.</p>
+
+    <p>Users must provide appropriate acknowledgment in accordance with applicable scientific standards when using results of the web application in publications, presentations, or other forms of dissemination.</p>
+
+    <p>PREMIER has received funding from the Innovative Medicines Initiative 2 Joint Undertaking (JU) under grant agreement No 875508. The JU receives support from the EU’s Horizon 2020 research and innovation programme and the European Federation of Pharmaceutical Industries and Associations (EFPIA). The JU is not responsible for any use that may be made of the information this database contains.</p>
+
+    <h2>Privacy policy</h2>
+    <p>The ePiE web application does not store any personal data or user information. All data is processed and displayed in the browser only, and no information is sent to any server, the data will be cleared from the browser's memory when the user closes the application.</p>
+
+    <!-- Agree / Disagree -->
+    <!-- If you like you can add a line of the storage of privacy related data. I guess you know better than I do what to say there. -->
+    
+    <button id="agreeDisclaimer" class="action_button" onclick="removeDisclaimer()">Accept</button>
+    <button id="disagreeDisclaimer" class="action_button" onclick="window.location.href='https://imi-premier.eu/';">Decline</button>
   </div>
 
   <div class="sidebar">
@@ -507,53 +533,69 @@
 
     <div class="card" style="grid-column: span 2;">
       <h3>Table 1 - API properties</h3>
-      <p>Please hover over the table headers to get an explanation of each parameter.</p>
+      <p>Please hover over the table headers to get an explanation of each parameter. If the table is too wide, please scroll horizontally to see all columns.</p>
 
       <div style="margin-bottom: 1px;">
         <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
         <button type="button" class="action_button" id="save" onclick="saveTabValues()">Save table</button>
         <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
+         <div id="API_table1_help_box" class="help_box_holder_style" style="display: inline-block;">
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h1">Name of the active pharmaceutical ingredient (API)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h2">CAS number (API identifier)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h3">Chemical class of the API (neutral/acid/base)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h4">Molecular weight (g/mol)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h5">Octanol/water partitioning coefficient of the neutral form (-)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h6">Vapour pressure at 25 °C (Pa)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h7">Solubility in water at 25 °C (mg/L)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h8">Acid dissociation coefficient (-)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h9">Fraction of dose excreted unchanged via urine (-)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t1_h10">First order biodegradation rate constant for secondary treatment (per second)</p>
+         </div>
       </div>
 
       <form class="API_table_form" id="form_table1_chem" style="overflow-x: auto;">
         <table id="API_table" cellspacing="0" cellpadding="4">
           <tbody>
             <tr>
-              <th class="api tableHeader"> <span class="firstSpan">API<br>
-                  <p>(id)</p><span class="secondSpan">Name of the active pharmaceutical ingredient (API)</span>
+              <th class="api tableHeader" id="t1_c1" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">API<br>
+                  <p>(id)</p>
+                  <!-- <span class="secondSpan">Name of the active pharmaceutical ingredient (API)</span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">CAS<br>
-                  <p>(number)</p><span class="secondSpan">CAS number</span>
+              <th class="api tableHeader" id="t1_c2" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> 
+                <span class="firstSpan">CAS<br><p>(number)</p>
+                  <!-- <span class="secondSpan">CAS number</span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">class<br>
-                  <p>(neutral/acid/base)</p><span class="secondSpan">Chemical class of the API <p class="hover_unit">
-                      (neutral/acid/base)</p></span>
+              <th class="api tableHeader" id="t1_c3" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">class<br>
+                  <p>(neutral/acid/base)</p>
+                  <!-- <span class="secondSpan">Chemical class of the API <p class="hover_unit">(neutral/acid/base)</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">MW<br>
-                  <p>(g/mol)</p><span class="secondSpan">Molecular weight (for APIs that are salts: preferably enter
-                    molecular weight of free acid/base) <p class="hover_unit">(g/mol)</p></span>
+              <th class="api tableHeader" id="t1_c4" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">MW<br>
+                  <p>(g/mol)</p>
+                  <!-- <span class="secondSpan">Molecular weight (for APIs that are salts: preferably entermolecular weight of free acid/base) <p class="hover_unit">(g/mol)</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">KOW_n<br>
-                  <p>(-)</p><span class="secondSpan">Octanol/water partitioning coefficient of the neutral form<p
-                      class="hover_unit">-</p></span>
+              <th class="api tableHeader" id="t1_c5" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">KOW_n<br>
+                  <p>(-)</p>
+                  <!-- <span class="secondSpan">Octanol/water partitioning coefficient of the neutral form<p class="hover_unit">-</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">Pv<br>
-                  <p>(Pa)</p><span class="secondSpan">Vapour pressure at 25 °C <p class="hover_unit">Pa</p></span>
+              <th class="api tableHeader" id="t1_c6" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">Pv<br><p>(Pa)</p>
+                <!-- <span class="secondSpan">Vapour pressure at 25 °C <p class="hover_unit">Pa</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">S<br>
-                  <p>(mg/L)</p><span class="secondSpan">Solubility in water at 25 °C <p class="hover_unit">mg/L</p></span>
+              <th class="api tableHeader" id="t1_c7" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">S<br>
+                  <p>(mg/L)</p>
+                  <!-- <span class="secondSpan">Solubility in water at 25 °C <p class="hover_unit">mg/L</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">pKa<br>
-                  <p>(-)</p><span class="secondSpan">Acid dissociation coefficient <p class="hover_unit">-</p></span>
+              <th class="api tableHeader" id="t1_c8" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">pKa<br>
+                  <p>(-)</p>
+                  <!-- <span class="secondSpan">Acid dissociation coefficient <p class="hover_unit">-</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">f_uf<br>
-                  <p>(-)</p><span class="secondSpan">Fraction of dose excreted unchanged via urine <p class="hover_unit">-
-                    </p></span>
+              <th class="api tableHeader" id="t1_c9" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">f_uf<br>
+                  <p>(-)</p>
+                  <!-- <span class="secondSpan">Fraction of dose excreted unchanged via urine <p class="hover_unit">-</p></span> -->
                 </span> </th>
-              <th class="api tableHeader"> <span class="firstSpan">k_bio_wwtp<br>
-                  <p>(unit)</p><span class="secondSpan">First order biodegradation rate constant for secondary treatment <p
-                      class="hover_unit">unit</p></span>
+              <th class="api tableHeader" id="t1_c10" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">k_bio_wwtp<br>
+                  <p>(s-1)</p>
+                  <!-- <span class="secondSpan">First order biodegradation rate constant for secondary treatment <pclass="hover_unit">unit</p></span> -->
                 </span> </th>
               <!-- <th class="api tableHeader">metab</th>
             <th class="api tableHeader">API_metab</th> -->
@@ -577,6 +619,7 @@
       </form>
     </div>
 
+
     <div class="card" style="grid-column: span 2;">
       <h3>Table 2 - API-specific fate parameters</h3>
       <!-- <p>tabcontent.</p> -->
@@ -590,6 +633,24 @@
         <button type="button" class="action_button" id="save2" onclick="saveTabValues()">Save table</button>
         <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
+        <div id="API_table2_help_box" class="help_box_holder_style" style="display: inline-block;">
+
+          <!-- table 2 t2 -->
+          <p class="help_box_style" style="visibility: hidden;" id="t2_h1">Name of the active pharmaceutical ingredient (API)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2_h2">Sewage-solids water partitioning coefficient of neutral form (L water/kg solids)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2_h3">Activated sludge-solids water partitioning coefficient of neutral form (L water/kg solids)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2_h4">Sediment-water partitioning coefficient of neutral form (L water/kg sediment)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2_h5">Soil organic carbon-water partition coefficient of the neutral form (L water/kg solids)</p>
+
+          <!-- table 2 alt t2a -->
+          <p class="help_box_style" style="visibility: hidden;" id="t2a_h1">Name of the active pharmaceutical ingredient (API)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2a_h2">Octanol/water partitioning coefficient of the alternative form (-)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2a_h3">Sewage-solids water partitioning coefficient of alternative form (L water/kg solids)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2a_h4">Activated sludge-solids water partitioning coefficient of alternative form (L water/kg solids)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2a_h5">Sediment-water partitioning coefficient of alternative form (L water/kg sediment)</p>
+          <p class="help_box_style" style="visibility: hidden;" id="t2a_h6">Soil organic carbon-water partition coefficient of the alternative form (L water/kg solids)</p>
+
+         </div>
       </div>
 
       <form class="API_table_form" id="form_table2_chem" style="overflow-x: auto;">
@@ -598,24 +659,26 @@
             <tr>
               <!-- Kp_ps; Kp_as;	Kp_susp; Kp_sd;	KOC;	k_bio_wwtp;	k_bio_sw1;	T_bio_sw;	k_bio_sd1;	T_bio_sd; k_hydro_sw;	T_hydro_sw;	k_hydro_sd;	T_hydro_sd;	lambda_solar;	k_photo12_sw;  -->
 
-              <th class="api2 tableHeader2"> <span class="firstSpan">API<br>
-                  <p>(id)</p><span class="secondSpan"> Name of the active pharmaceutical ingredient (API) </span>
+              <th class="api2 tableHeader2" id="t2_c1"   onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">API<br>
+                  <p>(id)</p>
+                  <!-- <span class="secondSpan"> Name of the active pharmaceutical ingredient (API) </span> -->
                 </span> </th>
               <!--<th class="api2 tableHeader2"> <span class="firstSpan">KOW_n<br><p>(-)</p><span class="secondSpan">Octanol/water partitioning coefficient of the neutral form<p class="hover_unit">-</p></span></span> </th> -->
-              <th class="api2 tableHeader2"> <span class="firstSpan">Kp_ps_n<br>
-                  <p>(L/kg)</p><span class="secondSpan">Sewage-solids water partitioning coefficient of neutral form <p
-                      class="hover_unit">L water/kg solids</p></span>
+              <th class="api2 tableHeader2" id="t2_c2"   onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">Kp_ps_n<br>
+                  <p>(L/kg)</p>
+                  <!-- <span class="secondSpan">Sewage-solids water partitioning coefficient of neutral form <p class="hover_unit">L water/kg solids</p></span> -->
                 </span> </th>
-              <th class="api2 tableHeader2"> <span class="firstSpan">Kp_as_n<br>
-                  <p>(L/kg)</p><span class="secondSpan">Activated sludge-solids water partitioning coefficient of neutral
-                    form <p class="hover_unit">L water/kg solids</p></span>
+              <th class="api2 tableHeader2" id="t2_c3"   onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">Kp_as_n<br>
+                  <p>(L/kg)</p>
+                  <!-- <span class="secondSpan">Activated sludge-solids water partitioning coefficient of neutral form <p class="hover_unit">L water/kg solids</p></span> -->
                 </span> </th>
-              <th class="api2 tableHeader2"> <span class="firstSpan">Kp_sd_n<br>
-                  <p>(L/kg)</p><span class="secondSpan">Sediment-solids water partitioning coefficient of neutral form <p
-                      class="hover_unit">L water/kg solids</p></span>
+              <th class="api2 tableHeader2" id="t2_c4"   onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">Kp_sd_n<br>
+                  <p>(L/kg)</p>
+                  <!-- <span class="secondSpan">Sediment-solids water partitioning coefficient of neutral form <p class="hover_unit">L water/kg solids</p></span> -->
                 </span> </th>
-              <th class="api2 tableHeader2"> <span class="firstSpan">KOC_n<br>
-                  <p>(-)</p><span class="secondSpan"> ... <p class="hover_unit">...</p></span>
+              <th class="api2 tableHeader2" id="t2_c5"   onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> 
+                <span class="firstSpan">KOC_n<br><p>(L/kg)</p>
+                  <!-- <span class="secondSpan"> ... <p class="hover_unit">...</p></span> -->
                 </span> </th>
 
               <!-- <th class="api2 tableHeader2"> <span class="firstSpan">k_bio_wwtp_n<br><p>(s-1)</p><span class="secondSpan">First order biodegradation rate constant secondary treatment of neutral form <p class="hover_unit">s-1</p></span></span> </th> -->
@@ -657,27 +720,29 @@
             <tr>
               <!-- Kp_ps; Kp_as;	Kp_susp; Kp_sd;	KOC;	k_bio_wwtp;	k_bio_sw1;	T_bio_sw;	k_bio_sd1;	T_bio_sd; k_hydro_sw;	T_hydro_sw;	k_hydro_sd;	T_hydro_sd;	lambda_solar;	k_photo12_sw;  -->
 
-              <th class="api2 tableHeader2alt"> <span class="firstSpan">API<br>
-                  <p>(id)</p><span class="secondSpan"> Name of the active pharmaceutical ingredient (API) </span>
+              <th class="api2 tableHeader2alt" id="t2a_c1" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">API<br>
+                  <p>(id)</p>
+                  <!-- <span class="secondSpan">Name of the active pharmaceutical ingredient (API)</span> -->
                 </span> </th>
-              <th class="api2alt tableHeader2alt"> <span class="firstSpan">KOW_alt<br>
-                  <p>(-)</p><span class="secondSpan">Octanol/water partitioning coefficient of the alternative form<p
-                      class="hover_unit">-</p></span>
+              <th class="api2alt tableHeader2alt" id="t2a_c2" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">KOW_alt<br>
+                  <p>(-)</p>
+                  <!-- <span class="secondSpan">Octanol/water partitioning coefficient of the alternative form<p class="hover_unit">-</p></span> -->
                 </span> </th>
-              <th class="api2alt tableHeader2alt"> <span class="firstSpan">Kp_ps_alt<br>
-                  <p>(L/kg)</p><span class="secondSpan">Sewage-solids water partitioning coefficient of alternative form
-                    <p class="hover_unit">L water/kg solids</p></span>
+              <th class="api2alt tableHeader2alt" id="t2a_c3" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">Kp_ps_alt<br>
+                  <p>(L/kg)</p>
+                  <!-- <span class="secondSpan">Sewage-solids water partitioning coefficient of alternative form<p class="hover_unit">L water/kg solids</p></span> -->
                 </span> </th>
-              <th class="api2alt tableHeader2alt"> <span class="firstSpan">Kp_as_alt<br>
-                  <p>(L/kg)</p><span class="secondSpan">Activated sludge-solids water partitioning coefficient of
-                    alternative form <p class="hover_unit">L water/kg solids</p></span>
+              <th class="api2alt tableHeader2alt" id="t2a_c4" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> 
+                <span class="firstSpan">Kp_as_alt<br><p>(L/kg)</p>
+                  <!-- <span class="secondSpan">Activated sludge-solids water partitioning coefficient of alternative form <p class="hover_unit">L water/kg solids</p></span> -->
                 </span> </th>
-              <th class="api2alt tableHeader2alt"> <span class="firstSpan">Kp_sd_alt<br>
-                  <p>(L/kg)</p><span class="secondSpan">Sediment-solids water partitioning coefficient of alternative form
-                    <p class="hover_unit">L water/kg solids</p></span>
+              <th class="api2alt tableHeader2alt" id="t2a_c5" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">Kp_sd_alt<br>
+                  <p>(L/kg)</p>
+                  <!-- <span class="secondSpan">Sediment-solids water partitioning coefficient of alternative form <p class="hover_unit">L water/kg solids</p></span> -->
                 </span> </th>
-              <th class="api2alt tableHeader2alt"> <span class="firstSpan">KOC_alt<br>
-                  <p>(-)</p><span class="secondSpan"> ... <p class="hover_unit">...</p></span>
+              <th class="api2alt tableHeader2alt" id="t2a_c6" onmouseover="helpBoxT1(this)" onmouseout="helpBoxT1Out(this)"> <span class="firstSpan">KOC_alt<br>
+                  <p>(-)</p>
+                  <!-- <span class="secondSpan"> ... <p class="hover_unit">...</p></span> -->
                 </span> </th>
 
 
@@ -1262,6 +1327,40 @@
     for(var i = 0; i < elems.length; i++) elems[i].style.display = "none"; // hide debugging info, map results
 
   </script>
+
+    <!-- hover help info boxes -->
+    <script>
+      
+      function helpBoxT1(x) {
+        let box_id = x.id;
+        let table_id = box_id.split("_")[0]
+        let help_box_id = table_id + "_h" + box_id.split("c")[1];
+        document.getElementById(help_box_id).style.visibility = "visible";
+        // console.log(help_box_id);
+      }
+
+      function helpBoxT1Out(x) {
+        let box_id = x.id;
+        let table_id = box_id.split("_")[0]
+        let help_box_id = table_id + "_h" + box_id.split("c")[1];
+        document.getElementById(help_box_id).style.visibility = "hidden";
+        // console.log(help_box_id);
+      }
+
+    </script>
+
+    <!-- removeDisclaimer -->
+    <script>
+      document.getElementById('disclaimerWarning').style.display='block';
+      document.getElementsByClassName("sidebar")[0].style.transition = "opacity 0.7s ease";
+      document.getElementsByClassName("main")[0].style.transition = "opacity 0.7s ease";
+
+      function removeDisclaimer(){
+        document.getElementById('disclaimerWarning').style.display='none';
+        document.getElementsByClassName("sidebar")[0].style.opacity = "1";
+        document.getElementsByClassName("main")[0].style.opacity = "1";
+      }
+    </script>
 
 </body>
 </html>

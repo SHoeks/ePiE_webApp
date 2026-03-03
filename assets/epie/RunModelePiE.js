@@ -284,6 +284,15 @@ async function RunModelePiE(settings, basinData) {
     console.log("ePiE results:", ptsResults);
     Progress_bar.style.width = 100 + "%";
 
+    // Show done message
+    await new Promise(resolve => setTimeout(resolve, 50));
+    console.log("Run ePiE completed.");
+    CMD_out_obj.innerText += "\n";
+    // CMD_out_obj.innerText += "\n";
+    CMD_out_obj.innerText += "ePiE run completed.\n";
+    CMD_out_obj.scrollTop = CMD_out_obj.scrollHeight;
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     // // read outputs
     // let geojsonpath = path.join(dirName, 'pts.geojson');
     // let csvpath = path.join(dirName, 'pts_out.csv');
