@@ -8,35 +8,35 @@ getAllSettings = function() {
     var set_flowSelection = document.getElementById('selectedFlowDataFull').textContent;
 
     // check basins selected
-    if(set_basinsIDS === "{Undefined}"){
+    if(set_basinsIDS === "{Undefined}" | set_basinsIDS === ''){
         console.log('getAllSettings, no basins selected.');
         alert("No basins selected, please select the basins of interest to proceed.");
         return; // No basins selected or error occurred
     }
 
     // check chem data
-    if(set_APIProperties === "{Undefined}"){
+    if(set_APIProperties === "{Undefined}" | set_APIProperties === ''){
         console.log('getAllSettings, no chemical data provided.');
         alert("No chemical data provided, please set the chemical data to proceed.");
         return; // No basins selected or error occurred
     }
 
     // check wwtp data
-    if(set_wwtpRemovalData === "{Undefined}"){
+    if(set_wwtpRemovalData === "{Undefined}" | set_wwtpRemovalData === ''){
         console.log('getAllSettings, no wwtp data provided.');
         alert("No WWTP removal data provided, please set the WWTP removal data to proceed.");
         return; // No basins selected or error occurred
     }
     
     // no consumption data check
-    if(set_consumptionData === "{Undefined}"){
+    if(set_consumptionData === "{Undefined}" | set_consumptionData === ''){
         console.log('getAllSettings, no consumption data provided.');
         alert("No consumption data provided, please set the consumption data to proceed.");
         return; // No basins selected or error occurred
     }
     
     // no consumption data check
-    if(set_flowSelection === "{Undefined}"){
+    if(set_flowSelection === "{Undefined}" | set_flowSelection === ''){
         console.log('getAllSettings, no flow selection provided.');
         alert("No flow selection provided, please set the flow selection to proceed.");
         return; // No basins selected or error occurred

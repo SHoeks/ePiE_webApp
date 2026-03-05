@@ -78,6 +78,7 @@ export function checkConsumptionData(pts, chem, consData) {
             
             // If any null values in cons (after adding this API column), raise error
             if (cons.some(row => row[apiName] === null)) {
+                alert(`Prediction not possible due to insufficient consumption data for ${apiName}, please check if the provided consumption data matches the selected basins. To make sure, regenerate the consumption table so all required countries are included.`)
                 throw new Error(`Prediction not possible due to insufficient consumption data for ${apiName}`);
             }
         }
