@@ -353,7 +353,64 @@
       }
     }
 
+    /* Custom checkbox */
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 5px;
+        margin-bottom: 5px;
+      }
 
+      /* Hide default checkbox */
+      .checkbox-container input {
+        display: none;
+      }
+
+      /* Custom checkbox */
+      .checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #1f2937;
+        border-radius: 6px;
+        position: relative;
+        transition: all 0.2s ease;
+      }
+
+      /* Checked background */
+      .checkbox-container input:checked + .checkmark {
+        background-color: #2563eb;
+      }
+
+      /* Check icon */
+      .checkmark::after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      /* Show check */
+      .checkbox-container input:checked + .checkmark::after {
+        display: block;
+      }
+
+      /* Check shape */
+      .checkbox-container .checkmark::after {
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      .checkbox-container:hover .checkmark {
+        border-color: #2563eb;
+      }
 
     </style>
 
@@ -367,7 +424,7 @@
   </div>
 
   <div id="disclaimerWarning">
-    <h2>Legal disclaimer</h2>
+    <h2 style="margin-top:0px;margin-bottom:0.5em;">Legal disclaimer</h2>
     <p>By accessing or using the ePiE web application, including the data contained therein, you agree to the terms of this Disclaimer. If you do not agree, you must not use the ePiE web application.</p>
     
     <p>This web application is continuously in development and subject to change. It is maintained and controlled by the Department of Environmental Science from Radboud University in The Netherlands. The application was developed within the context of the IMI2 PREMIER project. Access to the application is being provided in furtherance of the IMI2 PREMIER objectives.</p>
@@ -380,8 +437,12 @@
 
     <p>PREMIER has received funding from the Innovative Medicines Initiative 2 Joint Undertaking (JU) under grant agreement No 875508. The JU receives support from the EU’s Horizon 2020 research and innovation programme and the European Federation of Pharmaceutical Industries and Associations (EFPIA). The JU is not responsible for any use that may be made of the information this web application contains.</p>
 
-    <h2>Privacy policy</h2>
+    <h2 style="margin-top:0px;margin-bottom:0.5em;">Privacy policy</h2>
     <p>The ePiE web application does not store any personal data or user information. All data is processed and displayed in the browser only, and no information is sent to any server, the data will be cleared from the browser's memory when the user closes the application.</p>
+
+    <label class="checkbox-container">
+      <input id="agreeCheckbox" type="checkbox"><span class="checkmark"></span>I have read the disclaimer.
+    </label>
 
     <!-- Agree / Disagree -->
     <!-- If you like you can add a line of the storage of privacy related data. I guess you know better than I do what to say there. -->
@@ -1356,9 +1417,15 @@
       document.getElementsByClassName("main")[0].style.transition = "opacity 0.7s ease";
 
       function removeDisclaimer(){
-        document.getElementById('disclaimerWarning').style.display='none';
-        document.getElementsByClassName("sidebar")[0].style.opacity = "1";
-        document.getElementsByClassName("main")[0].style.opacity = "1";
+        var checked = document.getElementById("agreeCheckbox").checked;
+        if(checked){
+          document.getElementById('disclaimerWarning').style.display='none';
+          document.getElementsByClassName("sidebar")[0].style.opacity = "1";
+          document.getElementsByClassName("main")[0].style.opacity = "1";
+        }else{
+          confirm("You need to confirm that you have read the disclaimer to use the ePiE model. Please read the disclaimer and check the box to confirm.");
+        }
+
       }
     </script>
 
