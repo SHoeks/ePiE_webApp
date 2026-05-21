@@ -81,11 +81,11 @@ function saveTabValues() {
   }
 
   // exclude data that is empty to keep existing values
-  for (const key in NewData) {
-    if (NewData[key] === "") {
-      delete NewData[key];
-    }
-  }
+  // for (const key in NewData) {
+  //   if (NewData[key] === "") {
+  //     delete NewData[key];
+  //   }
+  // }
 
   // keep new data fields that are different from currentDataSubset
   for (const key in NewData) {

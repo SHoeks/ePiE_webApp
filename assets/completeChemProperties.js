@@ -97,6 +97,7 @@ function runAPICompleteWrapper(){
   
   // preprocessing
   chem["k_bio_wwtp_n"] = chem["k_bio_wwtp"]
+  chem["k_bio_wwtp_alt"] = chem["k_bio_wwtp"]
   chem["API"]
   let chemArray = [chem];
   

@@ -78,6 +78,7 @@
     <script src="assets/setAllPNECvals.js"></script>
     <script src="assets/saveStatsToExcel.js"></script>
     <script src="assets/saveStatsToExcelRisks.js"></script>
+    <script src="assets/clearTabValues.js"></script>
     
     <!-- epie -->
     <script type="module" src="assets/epie/RunModelePiE.js"></script>
@@ -87,341 +88,8 @@
     <script src="data/model_inputs/example_chem.js"></script>
     <script src="data/resources/basins_js2/BasinIndex.js"></script>
 
-
-    <!-- new UI reformatting style -->
-    <style>
-    :root {
-      --bg: #f7f8fa;
-      --sidebar-bg: #ffffff;
-      --card-bg: #ffffff;
-      --border: #e5e7eb;
-      --text-dark: #1f2937;
-      --text-muted: #6b7280;
-      --accent: #2563eb;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      display: flex;
-      height: 100vh;
-      overflow-y: hidden !important;
-      color: var(--text-dark);
-    }
-
-    /* Sidebar */
-    .sidebar {
-      min-width: 180px;
-      width: 200px !important;
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      opacity: 0.1; /* start with low opacity, will be set to 1 after disclaimer is accepted */
-    }
-    .sidebar h1 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: bold;
-      padding: 5px 12px;
-    }
-    .sidebar nav {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .sidebar button {
-      padding: 10px 12px;
-      font-size: 14px;
-      border: none;
-      background: none;
-      text-align: left;
-      color: var(--text-muted);
-      border-radius: 8px;
-      cursor: pointer;
-      position: relative;
-      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
-    }
-
-    .sidebar button::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -2px;
-      width: 100%;
-      height: 2px;
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.25s ease;
-      border-radius: 2px;
-    }
-
-    .sidebar button:hover {
-      background: #f3f4f6;
-      color: var(--text-dark);
-      transform: translateX(4px);
-    }
-
-    .sidebar button:hover::after {
-      transform: scaleX(1.0);
-      left: 5px;
-      width: calc(100% - 10px);
-    }
-    .sidebar button:hover {
-      background: #f3f4f6;
-      color: var(--text-dark);
-    }
-
-    /* Main layout */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 24px;
-      overflow: auto;
-      overflow-x: hidden;
-      opacity: 0.1; /* start with low opacity, will be set to 1 after disclaimer is accepted */
-    }
-
-    .page-title {
-      font-size: 26px;
-      margin-bottom: 24px;
-      font-weight: bold;
-    }
-
-    /* Grid layout with cards */
-    .grid {
-      display: grid;
-      grid-template-columns: 50% 1fr;
-      gap: 24px;
-      /* height: calc(100vh - 200px); */
-      height: auto;
-    }
-
-    /* Card panels */
-    .card {
-      max-width: 1350px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .card h3 {
-      margin-top: 0;
-      font-size: 18px;
-      margin-bottom: 16px;
-    }
-    a {
-        color: #374151; /* darker gray—still subtle, more visible */
-        text-decoration: none;
-        position: relative;
-        padding: 2px 0;
-        background: #f3f4f6; /* soft highlight matching your UI */
-        transition: color 0.25s ease, background 0.25s ease;
-        border-radius: 4px;
-    }
-
-    a::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: -1px;
-        width: 100%;
-        height: 2px; /* more noticeable */
-        background: #2563eb; /* your accent blue */
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.25s ease;
-    }
-
-    a:hover {
-        color: #1f2937; /* stronger text color */
-        background: #f3f4f6; /* soft highlight matching your UI */
-        border-radius: 4px;
-    }
-
-    a:hover::after {
-        transform: scaleX(1);
-    }
-
-    /* Subtle Animations */
-    .card {
-      transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-    }
-
-    .card:hover {
-      transform: translateY(0px);
-      /* box-shadow: 0 4px 12px rgba(0,0,0,0.06); */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Fade-in on load */
-    body {
-      opacity: 0;
-      animation: fadeIn 0.6s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* Smooth slide-in panels */
-    .sidebar {
-      animation: slideInLeft 0.6s ease;
-    }
-    @keyframes slideInLeft {
-      from { transform: translateX(-30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 0.1; }
-    }
-
-    .main {
-      animation: slideInUp 1.2s ease;
-    }
-    @keyframes slideInUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 0.1; }
-    }
-
-
-    /* disclaimer + acknowledgments banner */
-    .disclaimer_grid {
-      background-color: #ebf6dd; padding: 10px;max-width: 1360px; overflow: hidden; 
-      border-radius: 12px; display: grid;grid-template-columns: 1fr 1fr 1fr 1fr 5fr; gap: 5px;
-    }
-    .disclaimer_logo {
-      background-color: #00000000;text-align: center;padding: 10px;font-size: 1px;
-    }
-    .disclaimer_txt {
-      background-color: #00000000;text-align: left;padding: 2px;font-size: 11px;padding-top: 10px;
-    }
-
-    @media (max-width: 1700px) {
-      .disclaimer_txt {
-        padding-top: 5px;
-      }
-    }
-
-    @media (max-width: 1400px) {
-      .disclaimer_txt {
-        background-color: #00000000;text-align: left;padding: 3px;font-size: 10px;
-      }
-      .disclaimer_grid {
-        gap: 3px;
-      }
-    }
-
-    /* if screenwidth < 1200px */
-    @media (max-width: 1200px) {
-      .disclaimer_grid {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-      }
-      .disclaimer_txt {
-        background-color: #00000000;text-align: center;padding: 10px;font-size: 10px; grid-column-start: 1;grid-column-end: 5;
-      }
-    }
-
-    /* mobileWarning */
-    #mobileWarning{
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #ffffff;
-      border: 2px solid #ff0000;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      z-index: 1000;
-      width: 80%;
-      max-width: 400px;
-      display: none;
-    }
-
-    /* if screenwidth < 900px */
-    @media (max-width: 900px) {
-      #mobileWarning{
-        display: block;
-      }
-      .main, .sidebar {
-        opacity: 0.1;
-      }
-    }
-
-    /* Custom checkbox */
-    .checkbox-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-family: Arial, sans-serif;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 5px;
-        margin-bottom: 5px;
-      }
-
-      /* Hide default checkbox */
-      .checkbox-container input {
-        display: none;
-      }
-
-      /* Custom checkbox */
-      .checkmark {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #1f2937;
-        border-radius: 6px;
-        position: relative;
-        transition: all 0.2s ease;
-      }
-
-      /* Checked background */
-      .checkbox-container input:checked + .checkmark {
-        background-color: #2563eb;
-      }
-
-      /* Check icon */
-      .checkmark::after {
-        content: "";
-        position: absolute;
-        display: none;
-      }
-
-      /* Show check */
-      .checkbox-container input:checked + .checkmark::after {
-        display: block;
-      }
-
-      /* Check shape */
-      .checkbox-container .checkmark::after {
-        left: 6px;
-        top: 2px;
-        width: 5px;
-        height: 10px;
-        border: solid white;
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
-      }
-
-      .checkbox-container:hover .checkmark {
-        border-color: #2563eb;
-      }
-
-    </style>
-
   </head>
 <body>
-
-  <div id="mobileWarning">
-    <h2>Warning: ePiE is not optimized for mobile devices or small screens</h2>
-    <p>Please use a desktop or laptop computer to access the full functionality of the ePiE application.</p>
-    <p>We apologize for any inconvenience.</p>
-  </div>
 
   <div id="disclaimerWarning">
     <h2 style="margin-top:0px;margin-bottom:0.5em;">Legal disclaimer</h2>
@@ -451,6 +119,14 @@
     <button id="disagreeDisclaimer" class="action_button" onclick="window.location.href='https://imi-premier.eu/';">Decline</button>
   </div>
 
+  <div id="mobileWarning">
+    <div id="mobileWarningInner">
+      <h2>Warning: ePiE is not optimized for mobile devices or small screens</h2>
+      <p>Please use a desktop or laptop computer to access the full functionality of the ePiE application.</p>
+      <p>We apologize for any inconvenience.</p>
+    </div>
+  </div>
+
   <div class="sidebar">
     <h1>ePiE</h1>
     <nav>
@@ -465,7 +141,7 @@
     <button id="tablink_Basin_result_stats" class="tablinks" onclick="openTabWrapper(event, 'Basin_result_stats')">Output statistics</button>
     <button id="tablink_PNEC_Map_results" class="tablinks" onclick="openTabWrapper(event, 'PNEC_Map_results')">Map risks</button>
     <button id="tablink_Risk_result_stats" class="tablinks" onclick="openTabWrapper(event, 'Risk_result_stats')">Risk statistics</button>
-    <button id="tablink_full_settings" class="tablinks" onclick="openTabWrapper(event, 'full_settings')">View Settings</button>
+    <button id="tablink_full_settings" class="tablinks" onclick="openTabWrapper(event, 'full_settings')">View settings</button>
     </nav>
   </div>
 
@@ -692,6 +368,10 @@
           default values</button>
         <button type="button" class="action_button" id="edit" onclick="editTabValues()">Edit table</button>
         <button type="button" class="action_button" id="save2" onclick="saveTabValues()">Save table</button>
+
+        <!-- add a clear table button for the table below -->
+        <button type="button" class="action_button" id="clear2" onclick="clearTabValues()">Clear table</button>
+
         <!-- <button type="button" class="action_button" onclick="addAPItableRow()">Insert row</button> -->
         <!-- <button type="button" class="action_button" onclick="removeLastAPItableRow()">Remove row</button> -->
         <div id="API_table2_help_box" class="help_box_holder_style" style="display: inline-block;">
