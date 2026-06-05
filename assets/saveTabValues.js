@@ -1,5 +1,43 @@
 function saveTabValues() {
 
+  // show scroll arrows if table is wider than container
+  var containerId = "API_table_form";
+  var tableId = "API_table";
+  var rightArrow = document.getElementById('scrollable_right_arrow');
+  var leftArrow = document.getElementById('scrollable_left_arrow');
+  var container = document.getElementsByClassName(containerId)[0];
+  var table = document.getElementById(tableId);
+  rightArrow.style.display = 'block';
+  leftArrow.style.display = 'block';
+  if(table.offsetWidth == 0 || container.offsetWidth == 0) {
+    // if the table or container is not rendered yet, use the screensize as a proxy to check if scroll buttons are needed
+    if(window.innerWidth < 1650) {
+      rightArrow.style.display = 'block';
+      leftArrow.style.display = 'none';
+    } else {
+      rightArrow.style.display = 'none';
+      leftArrow.style.display = 'none';
+    }
+  } else {
+    console.log(table.offsetWidth, container.offsetWidth, table.clientWidth, container.clientWidth);
+    if(table.offsetWidth <= container.offsetWidth) {
+      rightArrow.style.display = 'none';
+      leftArrow.style.display = 'none';
+    } else {
+      rightArrow.style.display = 'block';
+      leftArrow.style.display = 'block';
+    }
+  }
+
+  // if scrolled to the right hide left arrow and vice versa
+  if (container.scrollLeft == 0) {
+    rightArrow.style.display = 'block';
+    leftArrow.style.display = 'none';
+  } else {
+    rightArrow.style.display = 'none';
+    leftArrow.style.display = 'block';
+  }
+
   const roundingDigits = 3; 
   const roundingMinValue = 0.01; 
 
@@ -226,6 +264,7 @@ function saveTabValues() {
 
   // save consumption numbers to global settings tab
   setConsumptionToSettings();
+
 
 }
 

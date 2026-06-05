@@ -49,6 +49,61 @@
       var epie_results = null;
       // var epie_results_geom = null;
 
+      // scrollTabbleRight
+      scrollTabbleRight = function(tableId, containerId) {
+        console.log("scrolling right for table: " + tableId);
+        var container = document.getElementsByClassName(containerId)[0];
+        var table = document.getElementById(tableId);
+        var scrollAmount = table.offsetWidth - container.offsetWidth;
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        // hide the right arrow after scrolling
+        var rightArrow = document.getElementById('scrollable_right_arrow');
+        rightArrow.style.display = 'none';
+        // show the left arrow after scrolling
+        var leftArrow = document.getElementById('scrollable_left_arrow');
+        leftArrow.style.display = 'block';
+      };
+
+      scrollTableLeft = function(tableId, containerId) {
+        console.log("scrolling left for table: " + tableId);
+        var container = document.getElementsByClassName(containerId)[0];
+        container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
+        // hide the left arrow after scrolling
+        var leftArrow = document.getElementById('scrollable_left_arrow');
+        leftArrow.style.display = 'none';
+        // show the right arrow after scrolling
+        var rightArrow = document.getElementById('scrollable_right_arrow');
+        rightArrow.style.display = 'block';
+      };
+
+      // check if tableId is wider than containerId, if not hide the scroll buttons
+      checkTableScrollButtons = function(tableId, containerId) {
+        var container = document.getElementsByClassName(containerId)[0];
+        var table = document.getElementById(tableId);
+        var rightArrow = document.getElementById('scrollable_right_arrow');
+        var leftArrow = document.getElementById('scrollable_left_arrow');
+        console.log(table.offsetWidth, container.offsetWidth, table.clientWidth, container.clientWidth);
+        if(table.offsetWidth == 0 || container.offsetWidth == 0) {
+          // if the table or container is not rendered yet, use the screensize as a proxy to check if scroll buttons are needed
+          if(window.innerWidth < 1650) {
+             rightArrow.style.display = 'block';
+             leftArrow.style.display = 'none';
+          } else {
+            rightArrow.style.display = 'none';
+            leftArrow.style.display = 'none';
+          }
+        }else{
+          if (table.offsetWidth <= container.offsetWidth) {
+            rightArrow.style.display = 'none';
+            leftArrow.style.display = 'none';
+          } else {
+            rightArrow.style.display = 'block';
+            leftArrow.style.display = 'none';
+          }
+        }
+        
+      };
+
     </script>
 
     <!-- functions -->
@@ -79,6 +134,7 @@
     <script src="assets/saveStatsToExcel.js"></script>
     <script src="assets/saveStatsToExcelRisks.js"></script>
     <script src="assets/clearTabValues.js"></script>
+    <script src="assets/exportFullOutputExcel.js"></script>
     
     <!-- epie -->
     <script type="module" src="assets/epie/RunModelePiE.js"></script>
@@ -88,7 +144,11 @@
     <script src="data/model_inputs/example_chem.js"></script>
     <script src="data/resources/basins_js2/BasinIndex.js"></script>
 
+    <!-- for now hide the spatial export button -->
+    <style>#spatialExportButton {display: none;}</style>
+
   </head>
+
 <body>
 
   <div id="disclaimerWarning">
@@ -167,14 +227,14 @@
     <div class="card" style="grid-column: span 2;">
       <h3>Instructions</h3>
 
-      <p>By clicking through the different tabs at the top of the page, you can parameterize and run the ePiE model. For
+      <p>By clicking through the different tabs in the left margin of this page, you can parameterize and run the ePiE model. For
         defining the API properties there are two options:</p>
       <!-- <p><b>Contact details:</b> selwyn.hoeks@ru.nl</p> -->
       <ul>
         <li style="margin-top: 8px">You can make use of a pre-defined list of APIs for which the model is already parametrized (used by <a
             href="https://pubs.acs.org/doi/10.1021/acs.est.8b03862" target="_blank">Oldenkamp et al. 2018</a>). 
             This can be done by downloading the template using the "Get Excel template" button on the API properties tab.</li>
-        <li style="margin-top: 8px">The ePiE model can be parameterized by for new APIs by providing the required data entries. </li>
+        <li style="margin-top: 8px">The ePiE model can be parameterized by manually entering the required data in the tabs: "API properties", "WWTP removal", "River basin" and "Consumption data". </li>
       </ul>
       <p style="margin-bottom:0px;display:none;">
         A comprehensive manual can be found here: <a
@@ -354,6 +414,12 @@
           </tbody>
         </table>
       </form>
+
+      <div id="scrollable_container">
+        <div id="scrollable_left_arrow" style="display:none;" onclick="scrollTableLeft('API_table', 'API_table_form')">←</div>
+        <div id="scrollable_right_arrow" onclick="scrollTabbleRight('API_table', 'API_table_form')">→</div></div>
+      
+
     </div>
 
 
@@ -892,7 +958,7 @@
       <div id="mapholder">
         <div id="map"></div>
       </div>
-      <button class="action_button" style="margin-left: 10px;" type="button"
+      <button id="spatialExportButton" class="action_button" style="margin-left: 10px;" type="button"
         onclick="exportSpatialGEOJSONWrapper()">Export spatial data</button>
       <button class="action_button" id="ExcelExportBtnConc" style="margin-left: 10px;" type="button"
         onclick="exportFullOutputExcelWrapper()">Export full data as Excel</button>
@@ -1107,6 +1173,12 @@
         }
 
       }
+
+      // on resize check scroll buttons for tables
+      window.addEventListener('resize', function() {
+        checkTableScrollButtons("API_table", "API_table_form");
+      });
+
     </script>
 
 </body>

@@ -13,4 +13,10 @@ function editTabValues() {
   document.getElementById("save4").style.display = "inline-block";
   document.getElementById("save5").style.display = "inline-block";
 
+  // hide scroll arrows if present
+  var rightArrow = document.getElementById('scrollable_right_arrow');
+  var leftArrow = document.getElementById('scrollable_left_arrow');
+  rightArrow.style.display = 'none';
+  leftArrow.style.display = 'none';
+
 }

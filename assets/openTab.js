@@ -1,6 +1,11 @@
 
 function openTabWrapper(evt, tabName) {
 
+  if(tabName=="API_properties") {
+    console.log("check scroll buttons for API table")
+    checkTableScrollButtons('API_table', 'API_table_form');
+  }
+
   // check if tab is locked
   console.log("locked: " + tabName + " = " + lockedTabs[tabName]);
   

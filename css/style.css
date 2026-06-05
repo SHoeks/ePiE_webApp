@@ -1139,3 +1139,63 @@ body {
 .checkbox-container:hover .checkmark {
   border-color: #2563eb;
 }
+
+.card {
+  overflow: hidden !important;
+}
+
+/* arrow to indicate scrollable content */
+/* align right of parent div */
+#scrollable_container {
+  position: relative;
+}
+
+#scrollable_right_arrow {
+  position: absolute;
+  background-color: #f1f1f1;
+  border-radius: 25px;
+  border: 1px solid #2563eb;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  right: 5px;
+  bottom: 35px;
+  font-size: 20px;
+  opacity: 0.7;
+  animation: nudgeRight 1.5s infinite;
+  padding-left: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 6px;
+  cursor: pointer; 
+}
+
+@keyframes nudgeRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+#scrollable_left_arrow {
+  position: absolute;
+  background-color: #f1f1f1;
+  border-radius: 25px;
+  border: 1px solid #2563eb;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  left: 5px;
+  bottom: 35px;
+  font-size: 20px;
+  opacity: 0.7;
+  animation: nudgeLeft 1.5s infinite;
+  padding-left: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 6px;
+  cursor: pointer; 
+}
+
+@keyframes nudgeLeft {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-6px); }
+}
