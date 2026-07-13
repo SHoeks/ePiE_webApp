@@ -221,8 +221,8 @@ export function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi
     
     // Set default parameters for pts
     ptsCopy.forEach(row => {
-        row.BACT_sw = 1e+06;
-        row.BACT_sed = 1e+05;
+        row.BACT_sw = 1; // assuming BACT_sw and BACT_test to be the same //1e+06;
+        row.BACT_sed = 1; // assuming BACT_sw and BACT_test to be the same //1e+05;
         row.T_sw = 285;
         row.f_light = 0.5;
         row.C_susp = 1.5e-05;
@@ -241,8 +241,8 @@ export function setLocalParametersCustomRemovalFast3(pts, HL, cons, chem, chemIi
     // Set default parameters for HL
     if (HLCopy && HLCopy.length > 0) {
         HLCopy.forEach(row => {
-            row.BACT_sw = 1e+06;
-            row.BACT_sed = 1e+05;
+            row.BACT_sw = 1; // assuming BACT_sw and BACT_test to be the same //1e+06;
+            row.BACT_sed = 1; // assuming BACT_sw and BACT_test to be the same //1e+05;
             row.T_sw = 285;
             row.f_light = 0.5;
             row.C_OH_w = 1e-18;
