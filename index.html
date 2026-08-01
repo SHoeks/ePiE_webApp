@@ -47,6 +47,7 @@
 
       // variable to hold ePiE results
       var epie_results = null;
+      var epie_results_hl = null;
       // var epie_results_geom = null;
 
       // scrollTabbleRight
@@ -1127,7 +1128,8 @@
     checkTabLocks(lockedTabs);
 
     // load example settings for testing
-    setExampleSettings("example_inputs/ibu_settings.json");
+    // setExampleSettings("example_inputs/ibu_settings.json");
+    setExampleSettings("example_inputs/ibu_settings_full.json"); // for debugging!
 
     // hide certain elements on startup
     var elems = document.getElementsByClassName("results_stats_select");
@@ -1135,26 +1137,26 @@
 
   </script>
 
-    <!-- hover help info boxes -->
-    <script>
-      
-      function helpBoxT1(x) {
-        let box_id = x.id;
-        let table_id = box_id.split("_")[0]
-        let help_box_id = table_id + "_h" + box_id.split("c")[1];
-        document.getElementById(help_box_id).style.visibility = "visible";
-        // console.log(help_box_id);
-      }
+  <!-- hover help info boxes -->
+  <script>
+    
+    function helpBoxT1(x) {
+      let box_id = x.id;
+      let table_id = box_id.split("_")[0]
+      let help_box_id = table_id + "_h" + box_id.split("c")[1];
+      document.getElementById(help_box_id).style.visibility = "visible";
+      // console.log(help_box_id);
+    }
 
-      function helpBoxT1Out(x) {
-        let box_id = x.id;
-        let table_id = box_id.split("_")[0]
-        let help_box_id = table_id + "_h" + box_id.split("c")[1];
-        document.getElementById(help_box_id).style.visibility = "hidden";
-        // console.log(help_box_id);
-      }
+    function helpBoxT1Out(x) {
+      let box_id = x.id;
+      let table_id = box_id.split("_")[0]
+      let help_box_id = table_id + "_h" + box_id.split("c")[1];
+      document.getElementById(help_box_id).style.visibility = "hidden";
+      // console.log(help_box_id);
+    }
 
-    </script>
+  </script>
 
     <!-- removeDisclaimer -->
     <script>

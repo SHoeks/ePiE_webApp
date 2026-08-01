@@ -269,6 +269,7 @@ async function RunModelePiE(settings, basinData) {
 
     const ptsResults = results.pts.map(row => ({
         ID: row.ID,
+        ID_nxt: row.ID_nxt,
         basin_ID: row.basin_ID,
         Pt_type: row.Pt_type,
         HylakId: row.HylakId,
@@ -279,9 +280,19 @@ async function RunModelePiE(settings, basinData) {
         x: row.x,
         y: row.y
     }));
+    
+    // results.HL exists?
+    const hlResults = results.HL.map(row => ({
+        HylakId: row.Hylak_id,
+        C_w: row.C_w,
+        C_sd: row.C_sd
+    }));
 
+    epie_results_hl = hlResults;
     epie_results = ptsResults;
+    console.log("ePiE results full:", results);
     console.log("ePiE results:", ptsResults);
+    console.log("ePiE hl results:", hlResults);
     Progress_bar.style.width = 100 + "%";
 
     // Show done message
