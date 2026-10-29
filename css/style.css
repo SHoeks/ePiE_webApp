@@ -696,13 +696,69 @@ table input[type="text"]:read-only {
   padding: 0.3em 1em;
 }
 
-#legendColorBox {
+#legendtxtbox{
+  width: auto;
+  height: 17px;
+  border-radius: 3px;
+  /* display: inline-block; */
+  margin-right: 5px;
+  margin-bottom: 0px;
+  flex-shrink: 0;
+}
+
+#legendColorLine {
+  width: 15px;
+  height: 3px;
+  /* border-radius: 5px; */
+  display: inline-block;
+  margin-right: 5px;
+  margin-bottom: 2px;
+  flex-shrink: 0;
+}
+
+#legendColorNode {
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  display: inline-block;
-  margin-right: 5px;
+  /* display: inline-block; */
+  margin-right: 10px;
+  flex-shrink: 0;
 }
+
+#legendColorPolygon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  flex-shrink: 0;
+
+  clip-path: polygon(
+    10% 20%,
+    40% 8%,
+    90% 25%,
+    80% 80%,
+    30% 95%,
+    8% 60%
+  );
+}
+
+#legendColorBox {
+  width: 20px;
+  height: 17px;
+  border-radius: 3px;
+  /* display: inline-block; */
+  margin-right: 5px;
+  margin-bottom: 0px;
+  flex-shrink: 0;
+}
+
+.legendRow {
+    display: flex;
+    align-items: center;   /* vertical centering */
+    gap: 6px;
+    margin-bottom: 3px;
+}
+
+
 
 table input {
   text-align: center;

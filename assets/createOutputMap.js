@@ -311,13 +311,27 @@ function createOutputMap() {
       values.push(value);
     }
 
+    // legend color ramp
     for (let i = 0; i < colors.length; i++) {
-      div.innerHTML += `<div id="legendColorBox" style="background: ${colors[i]}"></div><span>${values[i]}</span><br>`;
+      div.innerHTML += `
+      <div class="legendRow">
+        <div id="legendColorBox" style="background: ${colors[i]}"></div>
+        <div id="legendtxtbox"><span>${values[i]}</span></div>
+      </div>`;
     }      
     // div.innerHTML += '<div id="legendColorBox" style="background: #448D40"></div><span>Forest</span><br>';
     // div.innerHTML += '<div id="legendColorBox" style="background: #E6E696"></div><span>Land</span><br>';
     // div.innerHTML += '<div id="legendColorBox" style="background: #E8E6E0"></div><span>Residential</span><br>';
     // div.innerHTML += '<div id="legendColorBox" style="background: #FFFFFF"></div><span>Ice</span><br>';
+
+
+    // add legend symbol indication
+    div.innerHTML += "<h5 style='margin: 10px 0px;'></h5>";
+    div.innerHTML += "<h5 style='font-size:0.8rem;margin: 5px 0px;'>Symbols</h5>";
+    div.innerHTML += `<div class="legendRow"><div id="legendColorLine" style="background: #000000"></div><div id="legendtxtbox"><span>River section</span></div></div>`;
+    div.innerHTML += `<div class="legendRow"><div id="legendColorPolygon" style="background: #000000"></div><div id="legendtxtbox"><span>Lakes</span></div></div>`;
+    div.innerHTML += `<div class="legendRow"><div id="legendColorNode" style="background: #000000"></div><div id="legendtxtbox"><span>Waste water treatment plant</span></div></div>`;
+
     return div;
   };
 

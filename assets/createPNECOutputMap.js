@@ -285,16 +285,35 @@ function createPNECOutputMap( ) {
   legend.onAdd = function() {
     var div = L.DomUtil.create("div", "legend");
     div.id = "outputmaplegend";
+
+    // add title
     div.innerHTML += "<h4 style='margin: 2px 0px;'>Legend</h4>";
     div.innerHTML += "<h5 style='font-size:0.8rem;margin: 5px 0px;'>Risk Quotient</h5>";
 
+    // add risk color scheme
     for (let i = 0; i < colorsDiver.length; i++) {
-      div.innerHTML += `<div id="legendColorBox" style="background: ${colorsDiver[i]}"></div><span>${riskVals[i]}</span><br>`;
+      // div.innerHTML += `<div id="legendColorBox" style="background: ${colorsDiver[i]}"></div><span>${riskVals[i]}</span><br>`;
+      div.innerHTML += `
+      <div class="legendRow">
+        <div id="legendColorBox" style="background: ${colorsDiver[i]}"></div>
+        <div id="legendtxtbox"><span>${riskVals[i]}</span></div>
+      </div>`;
     }      
     // div.innerHTML += '<div id="legendColorBox" style="background: #448D40"></div><span>Forest</span><br>';
     // div.innerHTML += '<div id="legendColorBox" style="background: #E6E696"></div><span>Land</span><br>';
     // div.innerHTML += '<div id="legendColorBox" style="background: #E8E6E0"></div><span>Residential</span><br>';
     // div.innerHTML += '<div id="legendColorBox" style="background: #FFFFFF"></div><span>Ice</span><br>';
+
+    // add symbols
+
+    // add legend symbol indication
+    div.innerHTML += "<h5 style='margin: 10px 0px;'></h5>";
+    div.innerHTML += "<h5 style='font-size:0.8rem;margin: 5px 0px;'>Symbols</h5>";
+    div.innerHTML += `<div class="legendRow"><div id="legendColorLine" style="background: #000000"></div><div id="legendtxtbox"><span>River section</span></div></div>`;
+    div.innerHTML += `<div class="legendRow"><div id="legendColorPolygon" style="background: #000000"></div><div id="legendtxtbox"><span>Lakes</span></div></div>`;
+    div.innerHTML += `<div class="legendRow"><div id="legendColorNode" style="background: #000000"></div><div id="legendtxtbox"><span>Waste water treatment plant</span></div></div>`;
+
+
     return div;
   };
 
